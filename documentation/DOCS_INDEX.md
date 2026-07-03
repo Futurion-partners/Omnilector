@@ -1,6 +1,6 @@
-# 📚 Índice de Documentación - Futurion Barcode
+# 📚 Índice de Documentación - Omnilector
 
-Este es el índice completo de toda la documentación disponible para el proyecto Futurion Barcode API.
+Este es el índice completo de toda la documentación disponible para el proyecto Omnilector API.
 
 ---
 
@@ -326,7 +326,7 @@ Este es el índice completo de toda la documentación disponible para el proyect
 1. **Busca en los archivos**: Usa `Ctrl+F` en tu editor
 2. **Revisa el índice**: Este documento lista todos los temas
 3. **Consulta el código**: Los archivos están bien comentados
-4. **Abre un issue**: [GitHub Issues](https://github.com/Futurion-partners/barcode-2/issues)
+4. **Abre un issue**: [GitHub Issues](https://github.com/Futurion-partners/Omnilector/issues)
 5. **Contacta soporte**: support@futurion.com
 
 ---
@@ -335,7 +335,7 @@ Este es el índice completo de toda la documentación disponible para el proyect
 
 ¿Falta algo en la documentación? ¿Encontraste un error? ¿Algo no está claro?
 
-**Abre un issue**: [github.com/Futurion-partners/barcode-2/issues](https://github.com/Futurion-partners/barcode-2/issues)
+**Abre un issue**: [github.com/Futurion-partners/Omnilector/issues](https://github.com/Futurion-partners/Omnilector/issues)
 
 Tu feedback nos ayuda a mejorar la documentación para todos. 🙏
 

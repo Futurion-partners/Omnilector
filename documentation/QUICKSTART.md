@@ -16,8 +16,8 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 ### Paso 2: Clonar el Proyecto
 
 ```bash
-git clone https://github.com/Futurion-partners/barcode-2.git
-cd barcode-2
+git clone https://github.com/Futurion-partners/Omnilector.git
+cd Omnilector
 ```
 
 ### Paso 3: Instalar Dependencias
@@ -29,7 +29,7 @@ uv sync
 ### Paso 4: Ejecutar el Servidor
 
 ```bash
-uv run futurion-barcode-dev
+uv run omnilector-dev
 ```
 
 ### Paso 5: Abrir el Cliente Web
@@ -84,8 +84,8 @@ Abre tu navegador en: **http://localhost:8000**
 ### Construir y Ejecutar
 
 ```bash
-docker build -t futurion-barcode:latest .
-docker run --rm -p 8000:8000 futurion-barcode:latest
+docker build -t omnilector:latest .
+docker run --rm -p 8000:8000 omnilector:latest
 ```
 
 ### Con Docker Compose
@@ -235,7 +235,7 @@ Para más detalles, consulta:
 
 ## 🆘 Soporte
 
-- **GitHub Issues**: [github.com/Futurion-partners/barcode-2/issues](https://github.com/Futurion-partners/barcode-2/issues)
+- **GitHub Issues**: [github.com/Futurion-partners/Omnilector/issues](https://github.com/Futurion-partners/Omnilector/issues)
 - **Email**: support@futurion.com
 
 ---

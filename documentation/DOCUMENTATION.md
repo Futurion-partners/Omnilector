@@ -1,4 +1,4 @@
-# 📚 Documentación Completa - Futurion Barcode API
+# 📚 Documentación Completa - Omnilector API
 
 ## 📋 Tabla de Contenidos
 
@@ -19,7 +19,7 @@
 
 ## 🎯 Introducción
 
-**Futurion Barcode** es una API moderna y eficiente para la detección y decodificación de códigos de barras y códigos QR en tiempo real. Desarrollada con **FastAPI** y **Python 3.13**, ofrece dos modos de operación:
+**Omnilector** es una API moderna y eficiente para la detección y decodificación de códigos de barras y códigos QR en tiempo real. Desarrollada con **FastAPI** y **Python 3.13**, ofrece dos modos de operación:
 
 - **Modo Imagen**: Procesamiento de imágenes estáticas mediante API REST
 - **Modo Tiempo Real**: Detección continua mediante WebSockets con transmisión de video
@@ -199,8 +199,8 @@ pip install uv
 
 #### Paso 2: Clonar el repositorio
 ```bash
-git clone https://github.com/Futurion-partners/barcode-2.git
-cd barcode-2
+git clone https://github.com/Futurion-partners/Omnilector.git
+cd Omnilector
 ```
 
 #### Paso 3: Instalar dependencias
@@ -211,10 +211,10 @@ uv sync
 #### Paso 4: Ejecutar el servidor
 ```bash
 # Modo desarrollo (con auto-reload)
-uv run futurion-barcode-dev
+uv run omnilector-dev
 
 # Modo producción
-uv run futurion-barcode
+uv run omnilector
 ```
 
 El servidor estará disponible en:
@@ -227,19 +227,19 @@ El servidor estará disponible en:
 #### Construir imagen
 ```bash
 # Con tag de commit
-docker build -t futurion-barcode:$(git rev-parse --short HEAD) .
+docker build -t omnilector:$(git rev-parse --short HEAD) .
 
 # Como latest
-docker build -t futurion-barcode:latest .
+docker build -t omnilector:latest .
 ```
 
 #### Ejecutar contenedor
 ```bash
 # Puerto por defecto (8000)
-docker run --rm -p 8000:8000 futurion-barcode:latest
+docker run --rm -p 8000:8000 omnilector:latest
 
 # Puerto personalizado
-docker run --rm -e PORT=8080 -p 80:8080 futurion-barcode:latest
+docker run --rm -e PORT=8080 -p 80:8080 omnilector:latest
 ```
 
 #### Docker Compose
@@ -927,7 +927,7 @@ curl -X POST http://localhost:8000/api/v1/image/ \
 ```
 barcode-python-main/
 ├── src/
-│   └── futurion_barcode/
+│   └── omnilector/
 │       ├── __init__.py              # Entry points
 │       ├── main.py                  # FastAPI app principal
 │       ├── models/                  # Modelos Pydantic
@@ -957,8 +957,8 @@ barcode-python-main/
 
 ```bash
 # 1. Clonar repo
-git clone https://github.com/Futurion-partners/barcode-2.git
-cd barcode-2
+git clone https://github.com/Futurion-partners/Omnilector.git
+cd Omnilector
 
 # 2. Instalar uv
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -971,7 +971,7 @@ source .venv/bin/activate  # Linux/macOS
 .venv\Scripts\activate     # Windows
 
 # 5. Ejecutar en modo desarrollo
-uv run futurion-barcode-dev
+uv run omnilector-dev
 ```
 
 ### Agregar Nuevos Detectores
@@ -1012,7 +1012,7 @@ sources.extend(['new-engine'] * len(new_codes))
 pytest
 
 # Con cobertura
-pytest --cov=src/futurion_barcode
+pytest --cov=src/omnilector
 ```
 
 #### Tests de Integración
@@ -1020,7 +1020,7 @@ pytest --cov=src/futurion_barcode
 **Test API REST**:
 ```python
 from fastapi.testclient import TestClient
-from futurion_barcode.main import app
+from omnilector.main import app
 
 client = TestClient(app)
 
@@ -1222,7 +1222,7 @@ version: '3.8'
 
 services:
   barcode-api:
-    image: futurion-barcode:latest
+    image: omnilector:latest
     container_name: barcode-api
     restart: unless-stopped
     ports:
@@ -1262,7 +1262,7 @@ spec:
     spec:
       containers:
       - name: barcode-api
-        image: futurion-barcode:latest
+        image: omnilector:latest
         ports:
         - containerPort: 8000
         env:
@@ -1340,7 +1340,7 @@ logging.getLogger().addHandler(handler)
 
 ```bash
 # Backup de la imagen Docker
-docker save futurion-barcode:latest | gzip > barcode-backup.tar.gz
+docker save omnilector:latest | gzip > barcode-backup.tar.gz
 
 # Restaurar
 gunzip -c barcode-backup.tar.gz | docker load
@@ -1388,7 +1388,7 @@ Este proyecto está bajo la licencia [MIT](LICENSE).
 
 ### Contacto
 - **Email**: support@futurion.com
-- **GitHub Issues**: [github.com/Futurion-partners/barcode-2/issues](https://github.com/Futurion-partners/barcode-2/issues)
+- **GitHub Issues**: [github.com/Futurion-partners/Omnilector/issues](https://github.com/Futurion-partners/Omnilector/issues)
 
 ### Recursos
 - [Documentación FastAPI](https://fastapi.tiangolo.com/)
@@ -1413,4 +1413,4 @@ Este proyecto está bajo la licencia [MIT](LICENSE).
 
 **Última actualización**: Octubre 6, 2025  
 **Versión**: 1.0.0  
-**Autor**: Harrison Pinto (@Futurion-partners)
+**Autor**: Futurion Partners (@Futurion-partners)

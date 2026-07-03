@@ -2,7 +2,7 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-from futurion_barcode.models.responses.barcode import BarcodeResponse
+from omnilector.models.responses.barcode import BarcodeResponse
 
 
 class WebSocketBase(BaseModel):

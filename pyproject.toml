@@ -1,10 +1,10 @@
 [project]
-name = "futurion-barcode"
+name = "omnilector"
 version = "1.0.0"
-description = "Add your description here"
+description = "API de detección y decodificación de códigos de barras y códigos QR en tiempo real"
 readme = "README.md"
 authors = [
-    { name = "Harrison Pinto", email = "haspima0@gmail.com" }
+    { name = "Futurion Partners" }
 ]
 requires-python = ">=3.13"
 dependencies = [
@@ -16,8 +16,8 @@ dependencies = [
 ]
 
 [project.scripts]
-futurion-barcode = "futurion_barcode:main"
-futurion-barcode-dev = "futurion_barcode:reload"
+omnilector = "omnilector:main"
+omnilector-dev = "omnilector:reload"
 
 [build-system]
 requires = ["hatchling"]

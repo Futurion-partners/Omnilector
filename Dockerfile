@@ -47,7 +47,7 @@ EXPOSE 8000
 # Run the FastAPI application
 CMD [\
 	"sh", "-c",\
-	"uv run futurion-barcode"\
+	"uv run omnilector"\
 	]
 
 # Optional container health check using /health endpoint

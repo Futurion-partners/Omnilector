@@ -1,6 +1,6 @@
 import uvicorn
 
-from futurion_barcode.main import app
+from omnilector.main import app
 from os import getenv
 
 PORT = int(getenv("PORT", 8000))
@@ -17,7 +17,7 @@ def main() -> None:
 
 def reload() -> None:
     uvicorn.run(
-        "futurion_barcode.main:app",
+        "omnilector.main:app",
         host=HOST,
         port=PORT,
         reload=True,
