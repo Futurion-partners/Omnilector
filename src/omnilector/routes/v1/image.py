@@ -2,8 +2,8 @@ from hashlib import sha256
 
 from fastapi import APIRouter, File, UploadFile
 
-from futurion_barcode.models.responses.barcode import BarcodeResponse
-from futurion_barcode.utils.image import process_image
+from omnilector.models.responses.barcode import BarcodeResponse
+from omnilector.utils.image import process_image
 
 router = APIRouter(
     prefix='/image',

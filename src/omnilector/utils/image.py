@@ -24,7 +24,7 @@ try:
 except ImportError:
     ZXING_AVAILABLE = False
 
-from futurion_barcode.models.responses.barcode import BarcodeResponse
+from omnilector.models.responses.barcode import BarcodeResponse
 
 # Instancias reutilizables
 executor = ThreadPoolExecutor(max_workers=max(1, min(2, (os.cpu_count() or 2))))

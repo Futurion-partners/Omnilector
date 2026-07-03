@@ -1,4 +1,4 @@
-# 📷 Futurion Barcode - API de Detección de Códigos de Barras
+# 📷 Omnilector - API de Detección de Códigos de Barras
 
 Procesa varios tipos de códigos de barras y QR con facilidad. La API ofrece procesamiento de imágenes estáticas mediante REST y detección en tiempo real a través de WebSockets.
 
@@ -34,14 +34,14 @@ QR Code, Aztec Code, DataMatrix, PDF417
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # 2. Clonar proyecto
-git clone https://github.com/Futurion-partners/barcode-2.git
-cd barcode-2
+git clone https://github.com/Futurion-partners/Omnilector.git
+cd Omnilector
 
 # 3. Instalar dependencias
 uv sync
 
 # 4. Ejecutar servidor
-uv run futurion-barcode-dev
+uv run omnilector-dev
 
 # 5. Abrir navegador
 # http://localhost:8000
@@ -64,7 +64,7 @@ Ver **[QUICKSTART.md](QUICKSTART.md)** para instrucciones detalladas.
 
 ## 📋 Tabla de Contenidos
 
-- [Futurion Barcode](#futurion-barcode)
+- [Omnilector](#omnilector)
   - [Inicio Rápido](#inicio-rápido)
   - [Documentación Completa](#documentación-completa)
   - [Tabla de Contenidos](#tabla-de-contenidos)
@@ -86,7 +86,7 @@ Ver **[QUICKSTART.md](QUICKSTART.md)** para instrucciones detalladas.
 
 ### Interfaz Web (Recomendado)
 
-1. Inicia el servidor: `uv run futurion-barcode-dev`
+1. Inicia el servidor: `uv run omnilector-dev`
 2. Abre http://localhost:8000 en tu navegador
 3. Haz clic en "📷 Iniciar Cámara"
 4. Haz clic en "🔌 Conectar WebSocket"
@@ -135,8 +135,8 @@ cat .gitignore .prodignore > .dockerignore
 ##### Construir la Imagen Docker
 
 ```sh
-docker build -t futurion-barcode:$(git rev-parse --short HEAD) . # Etiquetar con el hash del commit actual
-docker build -t futurion-barcode:latest . # Etiquetar como latest
+docker build -t omnilector:$(git rev-parse --short HEAD) . # Etiquetar con el hash del commit actual
+docker build -t omnilector:latest . # Etiquetar como latest
 ```
 
 ##### Ejecutar la API
@@ -145,7 +145,7 @@ Una vez que hayas [construido](#construir-la-imagen-docker) la imagen, puedes ej
 el siguiente comando:
 
 ```sh
-docker run --rm -p 8000:8000 futurion-barcode:latest
+docker run --rm -p 8000:8000 omnilector:latest
 ```
 
 Ahora puedes ir a la [documentación generada](http://127.0.0.1:8000/docs)
@@ -162,7 +162,7 @@ que establecerá el número de puerto en `8080` y luego mapeará el puerto `80` 
 la máquina host al puerto `8080` del contenedor.
 
 ```bash
-docker run --rm -e PORT=8080 -p 80:8080 futurion-barcode:latest
+docker run --rm -e PORT=8080 -p 80:8080 omnilector:latest
 ```
 
 Y la API debería ser accesible en
@@ -248,7 +248,7 @@ Ejecutar con recarga [activada](#recarga-activada) o
 Esto actualizará la instancia de la API una vez que un archivo haya sido actualizado
 
 ```sh
-uv run futurion-barcode-dev
+uv run omnilector-dev
 ```
 
 ##### Recarga Desactivada
@@ -257,7 +257,7 @@ Esto ejecutará la API con el estado actual del proyecto y **no**
 se actualizará cuando modifiques tu código.
 
 ```sh
-uv run futurion-barcode
+uv run omnilector
 ```
 
 ---
@@ -269,7 +269,7 @@ uv run futurion-barcode
 pytest
 
 # Con cobertura
-pytest --cov=src/futurion_barcode
+pytest --cov=src/omnilector
 
 # Tests de integración
 pytest tests/integration/
@@ -279,13 +279,7 @@ pytest tests/integration/
 
 ## 🤝 Contribuir
 
-1. Fork el repositorio
-2. Crea una rama: `git checkout -b feature/nueva-funcionalidad`
-3. Commit tus cambios: `git commit -m "feat: agregar nueva funcionalidad"`
-4. Push: `git push origin feature/nueva-funcionalidad`
-5. Abre un Pull Request
-
-Ver **[DOCUMENTATION.md](DOCUMENTATION.md)** sección "Desarrollo y Contribución" para más detalles.
+Por favor, revisa nuestra **[Guía de Contribución (CONTRIBUTING.md)](CONTRIBUTING.md)** para conocer el proceso detallado para enviar contribuciones al proyecto.
 
 ---
 
@@ -334,13 +328,13 @@ Este proyecto está bajo la licencia MIT.
 
 ## 👥 Autores
 
-- **Harrison Pinto** - [@Futurion-partners](https://github.com/Futurion-partners)
+- **Futurion Partners** - [@Futurion-partners](https://github.com/Futurion-partners)
 
 ---
 
 ## 📞 Soporte
 
-- **GitHub Issues**: [github.com/Futurion-partners/barcode-2/issues](https://github.com/Futurion-partners/barcode-2/issues)
+- **GitHub Issues**: [github.com/Futurion-partners/Omnilector/issues](https://github.com/Futurion-partners/Omnilector/issues)
 - **Email**: support@futurion.com
 
 

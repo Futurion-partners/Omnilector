@@ -1,6 +1,6 @@
 from fastapi import WebSocket
 
-from futurion_barcode.models.responses.websocket import (WebSocketAck,
+from omnilector.models.responses.websocket import (WebSocketAck,
                                                          WebSocketError,
                                                          WebSocketResult)
 

@@ -1,4 +1,4 @@
-# 📡 API Reference - Futurion Barcode
+# 📡 API Reference - Omnilector
 
 ## Información General
 
@@ -647,7 +647,7 @@ interface WebSocketError {
 
 ```python
 from fastapi.testclient import TestClient
-from futurion_barcode.main import app
+from omnilector.main import app
 
 client = TestClient(app)
 
@@ -692,7 +692,7 @@ def test_websocket():
 ## 🆘 Soporte
 
 Para reportar bugs o solicitar features:
-- **GitHub Issues**: [github.com/Futurion-partners/barcode-2/issues](https://github.com/Futurion-partners/barcode-2/issues)
+- **GitHub Issues**: [github.com/Futurion-partners/Omnilector/issues](https://github.com/Futurion-partners/Omnilector/issues)
 - **Email**: support@futurion.com
 
 ---

@@ -18,6 +18,6 @@ v1_router.include_router(
 @v1_router.get("/version")
 async def get_version():
     """Return the current version of the API."""
-    return {"version": "1.0.0", "name": "futurion-barcode"}
+    return {"version": "1.0.0", "name": "omnilector"}
 
 __all__ = ['v1_router']

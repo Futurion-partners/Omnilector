@@ -3,11 +3,11 @@ import logging
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
-from futurion_barcode.models.responses.websocket import (WebSocketAck,
+from omnilector.models.responses.websocket import (WebSocketAck,
                                                          WebSocketError,
                                                          WebSocketResult)
-from futurion_barcode.utils.image import process_image
-from futurion_barcode.utils.websocket import (send_acknowledgement, send_error,
+from omnilector.utils.image import process_image
+from omnilector.utils.websocket import (send_acknowledgement, send_error,
                                               send_result)
 
 router = APIRouter(

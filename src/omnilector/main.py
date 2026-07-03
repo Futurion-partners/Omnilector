@@ -3,13 +3,13 @@ from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from pathlib import Path
 from fastapi.middleware.cors import CORSMiddleware
 
-from futurion_barcode.routes import api_router
+from omnilector.routes import api_router
 from importlib.metadata import version
 
 
 app = FastAPI(
     title="Barcode Detection API",
-    version=version("futurion_barcode")
+    version=version("omnilector")
 )
 
 # CORS (in case you use it from the browser)
@@ -37,7 +37,7 @@ def health():
 # Simple test page served by FastAPI (to allow HTTPS via a single origin)
 @app.get("/test", response_class=HTMLResponse)
 def websocket_test_page() -> str:
-    # Project root is two levels up from this file (src/futurion_barcode/main.py)
+    # Project root is two levels up from this file (src/omnilector/main.py)
     root = Path(__file__).resolve().parents[2]
     html_path = root / "websocket_test.html"
     

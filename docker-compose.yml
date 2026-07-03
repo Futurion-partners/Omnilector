@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: futurion-barcode:latest
+    image: omnilector:latest
     ports:
       - "8000:8000"
     environment:
@@ -16,6 +16,6 @@ services:
       retries: 3
       start_period: 10s
     # Uncomment to enable live-reload/dev mode (requires host bind mount and dev script)
-    # command: ["sh", "-c", "uv run futurion-barcode-dev"]
+    # command: ["sh", "-c", "uv run omnilector-dev"]
     # volumes:
     #   - .:/app
