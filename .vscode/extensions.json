@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "ms-python.python",
+    "ms-python.isort",
+    "ms-python.autopep8",
+    "davidanson.vscode-markdownlint",
+    "yzhang.markdown-all-in-one",
+    "usernamehw.errorlens"
+  ]
+}

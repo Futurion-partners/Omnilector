@@ -1,0 +1,12 @@
+#!include:.gitignore
+
+# Do not ignore environment variables from .env file
+!.env
+
+# Ignore deployment and development folders
+.github/
+.vscode/
+.git
+.gitignore
+.gcloudignore
+.env.example

@@ -1,0 +1,24 @@
+[project]
+name = "futurion-barcode"
+version = "1.0.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Harrison Pinto", email = "haspima0@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standard]>=0.135.2",
+    "opencv-contrib-python-headless>=4.13.0.92",
+    "pillow>=12.0.0",
+    "pyzbar>=0.1.9",
+    "zxing-cpp>=3.0.0",
+]
+
+[project.scripts]
+futurion-barcode = "futurion_barcode:main"
+futurion-barcode-dev = "futurion_barcode:reload"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

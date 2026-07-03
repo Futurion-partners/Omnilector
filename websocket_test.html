@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detección de Códigos de Barras en Tiempo Real.</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        video {
+            width: 100%;
+            max-width: 500px;
+            border: none; /* Mover el borde al contenedor para que el overlay coincida al píxel */
+            border-radius: 10px;
+            display: block; /* Evita espacios de línea extra */
+        }
+        canvas {
+            display: none;
+        }
+        #results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f5e8;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .status.connected {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .barcode-result {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+        .confirmed-result {
+            background: #d4edda !important;
+            border: 2px solid #28a745 !important;
+            font-weight: bold;
+        }
+        .scan-overlay {
+            position: absolute;
+            border: 2px solid #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+            pointer-events: none;
+            /* Tamaño/posición ahora los controla JS para alinear exactamente con el video */
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+            display: none;
+        }
+        .video-container {
+            position: relative;
+            display: inline-block;
+            border: 2px solid #333; /* Borde movido aquí para no desalinear el overlay */
+            border-radius: 10px;
+            overflow: hidden; /* Hace que el overlay respete el borde redondeado */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Detección de Códigos de Barras en Tiempo Real.</h1>
+        
+        <div id="status" class="status disconnected">Desconectado</div>
+        
+        <button id="startBtn" onclick="startCamera()">📷 Iniciar Cámara</button>
+        <button id="stopBtn" onclick="stopCamera()" disabled>⏹️ Detener</button>
+        <button id="focusBtn" onclick="triggerFocus()" disabled>🎯 Re-enfoque</button>
+        <button id="resetBtn" onclick="resetCameraSettings()" disabled title="Elimina configuraciones personalizadas y deja que la cámara decida">🔄 Nativo</button>
+        <button id="connectBtn" onclick="connectWebSocket()">🔌 Conectar WebSocket</button>
+        <button id="disconnectBtn" onclick="disconnectWebSocket()" disabled>❌ Desconectar</button>
+
+        <div style="margin-top:10px; padding:10px; background:#f8f9fa; border:1px solid #dee2e6; border-radius:6px;">
+            <label>Resolución:
+                <select id="resolution">
+                    <option value="960x720">960x720</option>
+                    <option value="1280x720">1280x720</option>
+                    <option value="1920x1080">1920x1080</option>
+                </select>
+            </label>
+            <label style="margin-left:12px">Calidad JPEG:
+                <input id="jpegQuality" type="range" min="0.5" max="0.95" step="0.05" value="0.9">
+                <span id="jpegQualityValue">0.90</span>
+            </label>
+            <label style="margin-left:12px">Intervalo (ms):
+                <input id="frameInterval" type="number" min="600" max="3000" step="200" value="1200">
+            </label>
+            <div style="margin-top: 8px;">
+                <label>
+                    <input type="checkbox" id="autoFocusMode"> <strong>Forzar Enfoque Continuo (Experimental)</strong>
+                </label>
+                <label style="margin-left:12px">
+                    <input type="checkbox" id="disableZoom"> <strong>Deshabilitar zoom (usar focal fijo)</strong>
+                </label>
+            </div>
+            <div style="margin-top: 8px;">
+                <label title="Envía imágenes en formato PNG sin pérdida. Más lento pero mucho más preciso. Ideal para códigos difíciles.">
+                    <input type="checkbox" id="pngMode"> <strong>Modo PNG sin pérdida</strong>
+                </label>
+            </div>
+            <div style="font-size:12px;color:#666;margin-top:6px;">
+                Sugerencia: para códigos 1D largos, prueba 1280x720, calidad 0.85, intervalo 1200 ms.
+                <br>Si la cámara no enfoca, prueba activando "Forzar Enfoque" o usa el botón "Re-enfoque".
+            </div>
+        </div>
+        
+        <br><br>
+        
+        <!-- Alternativa para subir archivo -->
+        <div style="margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;">
+            <strong>📤 Alternativa sin cámara:</strong><br>
+            <input type="file" id="fileInput" accept="image/*" onchange="processStaticImage()" style="margin: 5px 0;">
+            <small style="color: #6c757d;">Selecciona una imagen con códigos de barras desde tu galería</small>
+        </div>
+        
+        <br><br>
+        <div class="video-container">
+            <video id="video" autoplay playsinline></video>
+            <div id="scanOverlay" class="scan-overlay" style="display: none;"></div>
+        </div>
+        <canvas id="canvas"></canvas>
+        
+        <div id="results">
+            <h3>📊 Resultados:</h3>
+            <div id="barcodeResults">
+                <div style="padding: 15px; background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; text-align: center;">
+                    <h4 style="margin: 0 0 10px 0; color: #856404;">⚠️ WebSocket desconectado</h4>
+                    <p style="margin: 5px 0; color: #856404;">
+                        Para iniciar el escaneo, haz clic en el botón:<br>
+                        <strong>🔌 Conectar WebSocket</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 15px; padding: 10px; background: #f1f1f1; border: 1px solid #ccc; border-radius: 5px; font-size: 11px; font-family: monospace;">
+            <strong>📷 Cámaras detectadas (Debug):</strong>
+            <ul id="cameraList" style="margin: 5px 0; padding-left: 20px;">
+                <li><em>Inicia la cámara para ver la lista...</em></li>
+            </ul>
+            <div id="activeCameraInfo" style="margin-top: 5px; color: #0066cc; font-weight: bold;"></div>
+        </div>
+        
+        <div style="margin-top: 20px; font-size: 12px; color: #666;">
+            <p><strong>📋 Instrucciones:</strong></p>
+            <ul>
+                <li><strong>Opción 1 (Tiempo real):</strong> Haz clic en "Iniciar Cámara" → "Conectar WebSocket" → Apunta a códigos</li>
+                <li><strong>Opción 2 (Imagen):</strong> Selecciona una foto de tu galería usando el botón de archivo</li>
+                <li><strong>🔒 Detección confirmada:</strong> El código se bloquea tras 2 detecciones consecutivas. Usa "Escanear Otro" para continuar.</li>
+            </ul>
+            
+            <p><strong>🔧 Compatibilidad:</strong></p>
+            <ul>
+                <li><strong>✅ Funciona mejor en:</strong> Chrome, Firefox, Safari (iOS 11+)</li>
+                <li><strong>⚠️ Problemas conocidos:</strong> Navegadores antiguos, WebViews de apps</li>
+                <li><strong>🔐 Importante:</strong> Algunos navegadores requieren HTTPS para la cámara</li>
+            </ul>
+            
+            <p><strong>🆘 Si tienes problemas:</strong></p>
+            <ul>
+                <li>Usa la opción de "subir archivo" en lugar de cámara en vivo</li>
+                <li>Prueba desde: <a href="http://192.168.0.17:9000/docs" target="_blank">http://192.168.0.17:9000/docs</a></li>
+                <li>Verifica que ambos dispositivos estén en la misma WiFi</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+    let video = document.getElementById('video');
+    let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+        let ws = null;
+        let stream = null;
+        let isProcessing = false;
+        let isLocked = false; // Estado de bloqueo de código detectado
+        let isSendingFrames = false; // Evitar múltiples bucles de envío
+        let roiCanvas = null; // Canvas reutilizable para el ROI
+        let lockedBarcode = null; // Código bloqueado actual
+        let detectionConfidence = 0; // Contador de detecciones consecutivas
+        let frameCount = 0; // Contador total de frames enviados
+        let detectionCount = 0; // Contador de detecciones exitosas
+        const CONFIDENCE_THRESHOLD = 2; // Número de detecciones consecutivas para confirmar
+        const resolutionSel = document.getElementById('resolution');
+        const jpegQualityInput = document.getElementById('jpegQuality');
+        const jpegQualityValue = document.getElementById('jpegQualityValue');
+    const frameIntervalInput = document.getElementById('frameInterval');
+    const pngModeCheckbox = document.getElementById('pngMode');
+        const autoFocusCheckbox = document.getElementById('autoFocusMode');
+        const disableZoomCheckbox = document.getElementById('disableZoom');
+        // Construye dinámicamente las URLs usando el origen actual (soporta HTTP/HTTPS/ngrok)
+    const loc = window.location;
+    const isHttps = loc.protocol === 'https:';
+    // Usa el mismo host:puerto del origen actual (compatible con ngrok y LAN)
+    const hostWithPort = loc.host; // incluye puerto si existe
+    const WS_URL = (isHttps ? 'wss://' : 'ws://') + hostWithPort + '/api/v1/realtime/';
+    const REST_IMAGE_URL = (isHttps ? 'https://' : 'http://') + hostWithPort + '/api/v1/image/';
+        
+        function getSelectedResolution() {
+            const [w, h] = resolutionSel.value.split('x').map(Number);
+            return { width: w, height: h };
+        }
+
+        async function applyiOSFocusOptimizations(videoTrack) {
+            const capabilities = videoTrack.getCapabilities();
+            const settings = videoTrack.getSettings();
+            const config = {};
+
+            console.log('📱 Aplicando optimizaciones de enfoque...');
+            
+            // 1. Configurar enfoque continuo si está disponible Y el checkbox está marcado
+            if (autoFocusCheckbox.checked && capabilities.focusMode) {
+                if (capabilities.focusMode.includes('continuous')) {
+                    config.focusMode = 'continuous';
+                    console.log('✅ Enfoque continuo disponible y activado');
+                } else if (capabilities.focusMode.includes('single-shot')) {
+                    config.focusMode = 'single-shot';
+                    console.log('⚠️ Solo single-shot disponible');
+                }
+            }
+
+            // 2. iOS puede requerir focusDistance explícito
+            // Si el usuario activó "Enfoque automático continuo", intentamos no fijar distancia
+            // Pero si falla, el botón de re-enfoque puede ayudar
+            if (capabilities.focusDistance) {
+                // const minDist = capabilities.focusDistance.min || 0;
+                // const maxDist = capabilities.focusDistance.max || 1;
+                // ... lógica de distancia omitida por defecto para dejar que el auto-focus trabaje
+            }
+
+            // 3. Manejar zoom para evitar cámaras gran angular (que a veces no tienen foco variable)
+            if (!disableZoomCheckbox.checked && capabilities.zoom && settings.zoom !== undefined) {
+                const targetZoom = 1.0; 
+                const currentZoom = settings.zoom;
+                const minZoom = capabilities.zoom.min;
+                const maxZoom = capabilities.zoom.max;
+
+                // Si estamos en gran angular (< 0.9) o teleobjetivo (> 2.5), forzar a 1.0
+                if (currentZoom < 0.9 || currentZoom > 2.5) {
+                    config.zoom = Math.max(minZoom, Math.min(maxZoom, targetZoom));
+                    console.log(`⚙️ Ajustando zoom de ${currentZoom} a ${config.zoom}`);
+                }
+            }
+
+            if (Object.keys(config).length > 0) {
+                try {
+                    await videoTrack.applyConstraints({ advanced: [config] });
+                    console.log('✅ Configuración aplicada:', config);
+                } catch (err) {
+                    console.warn('⚠️ No se pudo aplicar configuración:', err.message);
+                }
+            }
+        }
+
+        async function resetCameraSettings() {
+            if (!stream) return;
+            const track = stream.getVideoTracks()[0];
+            try {
+                console.log('🔄 Restaurando configuración nativa de la cámara...');
+                // Intentar limpiar constraints avanzadas pasando un array vacío
+                await track.applyConstraints({ advanced: [] });
+                console.log('✅ Configuración nativa restaurada (advanced constraints eliminados)');
+            } catch (err) {
+                console.error('Error al restaurar configuración nativa:', err);
+            }
+        }
+
+        // Listener para cambiar modo de enfoque en tiempo real
+        autoFocusCheckbox.addEventListener('change', async () => {
+            if (stream) {
+                const track = stream.getVideoTracks()[0];
+                await applyiOSFocusOptimizations(track);
+            }
+        });
+
+        async function triggerFocus() {
+            if (!stream) return;
+            const track = stream.getVideoTracks()[0];
+            const capabilities = track.getCapabilities();
+            
+            console.log('🎯 Intentando re-enfocar...');
+            
+            try {
+                // Estrategia 1: Alternar modo de enfoque
+                if (capabilities.focusMode && capabilities.focusMode.includes('continuous')) {
+                    await track.applyConstraints({ advanced: [{ focusMode: 'auto' }] });
+                    setTimeout(async () => {
+                        await track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] });
+                        console.log('✅ Ciclo de enfoque completado');
+                    }, 500);
+                }
+                
+                // Estrategia 2: Si soporta focusDistance, hacer un barrido rápido
+                if (capabilities.focusDistance) {
+                    const min = capabilities.focusDistance.min || 0;
+                    const max = capabilities.focusDistance.max || 1;
+                    const mid = min + (max - min) * 0.3; // 30% (cerca)
+                    
+                    // Enfocar cerca y luego soltar
+                    await track.applyConstraints({ advanced: [{ focusDistance: mid }] });
+                    setTimeout(async () => {
+                        // Volver a continuo si es posible, o dejar en una distancia media
+                        if (capabilities.focusMode?.includes('continuous')) {
+                            await track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] });
+                        }
+                    }, 800);
+                }
+            } catch (err) {
+                console.error('Error al re-enfocar:', err);
+            }
+        }
+
+        async function selectBestBackCamera() {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const cameras = devices.filter(d => d.kind === 'videoinput');
+            
+            if (cameras.length === 0) {
+                console.warn('⚠️ No se encontraron cámaras disponibles');
+                return null;
+            }
+            
+            const scores = cameras.map(cam => {
+                const label = cam.label.toLowerCase();
+                let score = 0;
+                
+                // Si no hay label (permisos no concedidos), dar score neutral
+                if (!label || label === '') {
+                    return { device: cam, score: 0, label: 'unlabeled' };
+                }
+                
+                // Puntos positivos
+                if (/back|rear|environment|trasera|principal/.test(label)) score += 10;
+                if (/camera 0|caméra 0|kamera 0/.test(label)) score += 5; // Primera cámara suele ser principal
+                if (label.includes('main')) score += 8;
+                
+                // Puntos negativos
+                if (/front|user|selfie|face|frontal|delantera/.test(label)) score -= 100;
+                if (/wide|ultra|angular/.test(label)) score -= 20; // Gran angular
+                if (/tele|zoom/.test(label)) score -= 15; // Teleobjetivo
+                if (/0\.[56]|0\.6/.test(label)) score -= 20; // Zoom < 1.0 = gran angular
+                if (/[3-9]x|10x/.test(label)) score -= 15; // Zoom > 2x = tele
+                
+                return { device: cam, score, label };
+            });
+            
+            // Ordenar por score y tomar la mejor
+            scores.sort((a, b) => b.score - a.score);
+            
+            console.log('📊 Scores de cámaras:', scores.map(s => `${s.label}: ${s.score}`));
+            
+            return scores[0]?.device; // Mejor candidato
+        }
+
+        async function startCameraWithBestSelection() {
+            const { width, height } = getSelectedResolution();
+            
+            // 1. Obtener permisos iniciales para poder listar dispositivos con etiquetas
+            let initialStream = null;
+            try {
+                initialStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+            } catch (err) {
+                try {
+                    initialStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                } catch (err2) {
+                    throw new Error('CameraPermissionDenied');
+                }
+            }
+
+            // 2. Listar dispositivos y filtrar
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const videoDevices = devices.filter(d => d.kind === 'videoinput');
+            
+            // DEBUG: Mostrar lista de cámaras en UI
+            const cameraList = document.getElementById('cameraList');
+            if (cameraList) {
+                cameraList.innerHTML = '';
+                videoDevices.forEach(d => {
+                    const li = document.createElement('li');
+                    const isBack = d.label.toLowerCase().match(/back|trasera|rear|environment/);
+                    const isWide = d.label.toLowerCase().match(/wide|ultra|0\.5|macro/);
+                    let status = '';
+                    if (isBack) status += ' [TRASERA]';
+                    if (isWide) status += ' [WIDE⚠️]';
+                    
+                    li.textContent = `${d.label || 'Sin nombre'} ${status} (ID: ${d.deviceId.substring(0,5)}...)`;
+                    if (isWide) li.style.color = '#cc0000';
+                    if (isBack && !isWide) li.style.color = '#006600';
+                    cameraList.appendChild(li);
+                });
+            }
+
+            // Filtrar cámaras traseras
+            const backCameras = videoDevices.filter(d => {
+                const label = d.label.toLowerCase();
+                return label.includes('back') || label.includes('trasera') || label.includes('environment') || label.includes('rear');
+            });
+
+            // Si no hay cámaras traseras identificables por nombre, usar todas las de video
+            const candidates = backCameras.length > 0 ? backCameras : videoDevices;
+
+            // 3. Filtrar cámaras "malas" (Gran Angular / Wide)
+            // Samsung y otros Android suelen etiquetar como "wide", "ultra", "0.5x"
+            const goodCameras = candidates.filter(d => {
+                const label = d.label.toLowerCase();
+                return !label.includes('wide') && 
+                       !label.includes('ultra') && 
+                       !label.includes('0.5') &&
+                       !label.includes('macro'); // Macro a veces tampoco enfoca de lejos
+            });
+
+            console.log('📷 Cámaras encontradas:', videoDevices.map(d => d.label));
+            console.log('✅ Cámaras candidatas (filtradas):', goodCameras.map(d => d.label));
+
+            let selectedDeviceId = null;
+
+            if (goodCameras.length > 0) {
+                // Si tenemos candidatos "buenos", preferimos el que diga "main" o "principal" o "0"
+                const best = goodCameras.find(d => {
+                    const label = d.label.toLowerCase();
+                    return label.includes('main') || 
+                           label.includes('principal') || 
+                           label.includes('camera 0') || 
+                           label.includes('camera2 0') || // Fix para Samsung
+                           /\b0\b/.test(label); // Busca el número 0 como palabra completa
+                });
+                
+                // Si encontramos uno "mejor", lo usamos. Si no, usamos el primero de la lista filtrada.
+                selectedDeviceId = best ? best.deviceId : goodCameras[0].deviceId;
+            }
+
+            // Cerrar stream inicial
+            if (initialStream) {
+                initialStream.getTracks().forEach(t => t.stop());
+            }
+
+            // 4. Construir constraints
+            // ESTRATEGIA HÍBRIDA:
+            // - Si encontramos un deviceId específico que sabemos que NO es wide, lo usamos.
+            // - Si estamos en iOS (donde labels suelen ser genéricos "Back Camera"), 
+            //   o si no encontramos nada específico, volvemos a 'facingMode: environment' (Nativo).
+            
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            
+            let constraints;
+            
+            if (selectedDeviceId && !isIOS) {
+                // Android/PC: Usar ID específico para evitar gran angular
+                console.log('🤖 Android/PC detectado: Usando deviceId específico para evitar gran angular');
+                constraints = {
+                    video: {
+                        deviceId: { exact: selectedDeviceId },
+                        width: { ideal: width },
+                        height: { ideal: height }
+                    }
+                };
+            } else {
+                // iOS o Fallback: Dejar que el OS decida (funciona mejor en iPhone)
+                console.log('🍎 iOS o Genérico: Usando facingMode nativo');
+                constraints = {
+                    video: {
+                        facingMode: { exact: 'environment' },
+                        width: { ideal: width },
+                        height: { ideal: height }
+                    }
+                };
+            }
+            
+            try {
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+            } catch (err) {
+                console.warn('⚠️ Falló constraint principal, reintentando con fallback...');
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({
+                        video: {
+                            facingMode: 'environment',
+                            width: { ideal: width },
+                            height: { ideal: height }
+                        }
+                    });
+                } catch (err2) {
+                    stream = await navigator.mediaDevices.getUserMedia({
+                        video: {
+                            width: { ideal: width },
+                            height: { ideal: height }
+                        }
+                    });
+                }
+            }
+            
+            const videoTrack = stream.getVideoTracks()[0];
+            const settings = videoTrack.getSettings();
+            
+            // DEBUG: Mostrar cámara activa
+            const activeInfo = document.getElementById('activeCameraInfo');
+            if (activeInfo) {
+                activeInfo.textContent = `✅ Cámara activa: ${videoTrack.label} (ID: ${settings.deviceId?.substring(0,5)}...)`;
+            }
+
+            video.srcObject = stream;
+            document.getElementById('focusBtn').disabled = false;
+            document.getElementById('resetBtn').disabled = false;
+            
+            console.log('✅ Cámara iniciada:', {
+                label: videoTrack.label,
+                settings: settings,
+                facingMode: settings.facingMode
+            });
+        }
+
+        async function startCamera() {
+            try {
+                // Verificar soporte de getUserMedia con fallbacks para navegadores antiguos
+                if (!navigator.mediaDevices) {
+                    navigator.mediaDevices = {};
+                }
+
+                if (!navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia = function(constraints) {
+                        const getUserMedia = navigator.webkitGetUserMedia || 
+                                           navigator.mozGetUserMedia ||
+                                           navigator.msGetUserMedia;
+                        
+                        if (!getUserMedia) {
+                            return Promise.reject(new Error('getUserMedia no soportado en este navegador'));
+                        }
+
+                        return new Promise(function(resolve, reject) {
+                            getUserMedia.call(navigator, constraints, resolve, reject);
+                        });
+                    }
+                }
+                
+                // Usar la nueva función mejorada de selección de cámara
+                await startCameraWithBestSelection();
+                
+                document.getElementById('startBtn').disabled = true;
+                document.getElementById('stopBtn').disabled = false;
+                
+                // Configurar canvas cuando el video esté listo
+                video.addEventListener('loadedmetadata', () => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    // Posicionar y mostrar overlay de escaneo
+                    positionOverlay();
+                });
+                
+            } catch (err) {
+                let errorMsg = 'Error al acceder a la cámara: ';
+                
+                if (err.name === 'NotAllowedError' || err.message === 'CameraPermissionDenied') {
+                    errorMsg += 'Permisos de cámara denegados. Por favor permite el acceso a la cámara.';
+                } else if (err.name === 'NotFoundError') {
+                    errorMsg += 'No se encontró ninguna cámara en el dispositivo.';
+                } else if (err.name === 'NotSupportedError') {
+                    errorMsg += 'El navegador no soporta acceso a la cámara. Prueba con Chrome o Firefox.';
+                } else if (err.message === 'FrontCameraSelectedAfterFiltering') {
+                    errorMsg = 'No se pudo seleccionar una cámara trasera.\n\nAsegúrate de:\n- Haber concedido permisos de cámara\n- Que el dispositivo tenga cámara posterior\n- Probar en Chrome/Firefox actualizados\n\nNota: Por seguridad, la app nunca usará la cámara de selfie.';
+                } else {
+                    errorMsg += err.message || 'Error desconocido';
+                }
+                
+                alert(errorMsg + '\n\nAlternativamente, puedes usar la funcionalidad de subir imágenes en: http://192.168.0.17:9000/docs');
+                console.error('Error completo:', err);
+            }
+        }
+        
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            video.srcObject = null;
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+            document.getElementById('focusBtn').disabled = true;
+            document.getElementById('resetBtn').disabled = true;
+            // Ocultar overlay de escaneo
+            document.getElementById('scanOverlay').style.display = 'none';
+        }
+        
+        function connectWebSocket() {
+            try {
+                ws = new WebSocket(WS_URL);
+                
+                ws.onopen = function(event) {
+                    console.log('WebSocket conectado');
+                    document.getElementById('status').textContent = 'Conectado ✅';
+                    document.getElementById('status').className = 'status connected';
+                    document.getElementById('connectBtn').disabled = true;
+                    document.getElementById('disconnectBtn').disabled = false;
+                    
+                    // Empezar a enviar frames
+                    startSendingFrames();
+                };
+                
+                ws.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    console.log('📨 Respuesta recibida:', data);
+                    
+                    // Log adicional para detectar cuándo funciona bien
+                    if (data.ok && data.barcodes && data.barcodes.length > 0) {
+                        detectionCount++;
+                        const timestamp = new Date().toLocaleTimeString();
+                        const successRate = ((detectionCount / frameCount) * 100).toFixed(1);
+                        console.log(`✅ ${timestamp} - DETECCIÓN EXITOSA: ${data.barcodes.length} códigos (${detectionCount}/${frameCount} frames = ${successRate}% éxito)`);
+                        data.barcodes.forEach((code, i) => {
+                            console.log(`   📊 Código #${i+1}: ${code}`);
+                        });
+                        
+                        // Log tamaño de imagen ROI enviada (aproximado)
+                        if (roiCanvas) {
+                            console.log(`   📏 Tamaño ROI enviado: ${roiCanvas.width}x${roiCanvas.height}px`);
+                        }
+                    } else {
+                        console.log('❌ Sin detecciones en este frame');
+                    }
+                    
+                    displayResults(data);
+                };
+                
+                ws.onclose = function(event) {
+                    console.log('WebSocket desconectado');
+                    document.getElementById('status').textContent = 'Desconectado ❌';
+                    document.getElementById('status').className = 'status disconnected';
+                    document.getElementById('connectBtn').disabled = false;
+                    document.getElementById('disconnectBtn').disabled = true;
+                    
+                    // Mostrar mensaje de WebSocket desconectado
+                    const resultsDiv = document.getElementById('barcodeResults');
+                    resultsDiv.innerHTML = `
+                        <div style="padding: 15px; background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; text-align: center;">
+                            <h4 style="margin: 0 0 10px 0; color: #856404;">⚠️ WebSocket desconectado</h4>
+                            <p style="margin: 5px 0; color: #856404;">
+                                Para iniciar el escaneo, haz clic en el botón:<br>
+                                <strong>🔌 Conectar WebSocket</strong>
+                            </p>
+                        </div>
+                    `;
+                };
+                
+                ws.onerror = function(error) {
+                    console.error('Error WebSocket:', error);
+                    alert('Error de conexión WebSocket. Verifica que el servidor esté funcionando.');
+                };
+                
+            } catch (err) {
+                alert('Error al conectar WebSocket: ' + err.message);
+            }
+        }
+        
+        function disconnectWebSocket() {
+            if (ws) {
+                ws.close();
+                ws = null;
+            }
+            // Resetear estado de bloqueo al desconectar
+            isLocked = false;
+            lockedBarcode = null;
+            detectionConfidence = 0;
+            isSendingFrames = false; // Resetear flag de envío
+            
+            // Resetear contadores
+            frameCount = 0;
+            detectionCount = 0;
+            console.log('🔌 WebSocket desconectado - Contadores reiniciados');
+            
+            // Mostrar mensaje de WebSocket desconectado
+            const resultsDiv = document.getElementById('barcodeResults');
+            resultsDiv.innerHTML = `
+                <div style="padding: 15px; background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; text-align: center;">
+                    <h4 style="margin: 0 0 10px 0; color: #856404;">⚠️ WebSocket desconectado</h4>
+                    <p style="margin: 5px 0; color: #856404;">
+                        Para iniciar el escaneo, haz clic en el botón:<br>
+                        <strong>🔌 Conectar WebSocket</strong>
+                    </p>
+                </div>
+            `;
+        }
+        
+        function getDisplayedVideoRect() {
+            // Dimensiones reales del video
+            const vw = video.videoWidth || 0;
+            const vh = video.videoHeight || 0;
+            if (vw === 0 || vh === 0) return null;
+
+            // Dimensiones CSS del elemento video (contenido dentro del contenedor)
+            const container = video.parentElement; // .video-container
+            const cw = container.clientWidth;
+            const ch = video.clientHeight; // altura real renderizada del video
+
+            // El video mantiene su relación de aspecto; puede tener letterboxing
+            const videoAspect = vw / vh;
+            const containerAspect = cw / ch;
+
+            // En la práctica, al usar width:100% en el video, la altura renderizada ya respeta el aspect
+            // Por lo tanto, el contenido del video ocupa todo el ancho (cw) y tiene altura 'ch'.
+            // No obstante, si por estilos cambia, calculamos márgenes por si hay letterbox
+            let dispW = cw;
+            let dispH = ch;
+            let offsetX = 0;
+            let offsetY = 0;
+
+            // Si hubiese discrepancias, ajusta offsets (casos raros)
+            const expectedH = cw / videoAspect;
+            if (Math.abs(expectedH - ch) > 1) {
+                // Hay letterboxing vertical; centramos
+                if (expectedH < ch) {
+                    dispH = expectedH;
+                    offsetY = (ch - dispH) / 2;
+                } else {
+                    // Letterboxing horizontal hipotético (poco probable con width:100%)
+                    dispW = ch * videoAspect;
+                    offsetX = (cw - dispW) / 2;
+                }
+            }
+
+            return { x: offsetX, y: offsetY, width: dispW, height: dispH, vw, vh };
+        }
+
+        function positionOverlay() {
+            const overlay = document.getElementById('scanOverlay');
+            const rect = getDisplayedVideoRect();
+            if (!rect) return;
+
+            // ROI deseado como porcentaje de la zona visible del video
+            const roiW = rect.width * 0.80;
+            const roiH = rect.height * 0.30;
+            const roiX = rect.x + (rect.width - roiW) / 2;
+            const roiY = rect.y + (rect.height - roiH) / 2;
+
+            overlay.style.display = 'block';
+            overlay.style.left = `${roiX}px`;
+            overlay.style.top = `${roiY}px`;
+            overlay.style.width = `${roiW}px`;
+            overlay.style.height = `${roiH}px`;
+        }
+
+        // Reposicionar overlay cuando cambie el layout o al cargar metadata del video
+        window.addEventListener('resize', positionOverlay);
+
+        function startSendingFrames() {
+            // Evitar múltiples bucles simultáneos
+            if (isSendingFrames) {
+                console.log('⚠️ Ya hay un bucle de envío activo');
+                return;
+            }
+            
+            isSendingFrames = true;
+            let frameSkipCounter = 0;
+            const FRAME_SKIP = 9; // Procesar 1 de cada 10 frames para reducir carga
+            const MAX_BUFFERED = 512 * 1024; // 512KB de backpressure
+            const MAX_ROI_W = 640;
+            const MAX_ROI_H = 360;
+            
+            function sendFrame() {
+                // Si estamos bloqueados, detener completamente el envío
+                if (isLocked) {
+                    console.log('🔒 Detección bloqueada - pausando envío de frames');
+                    isSendingFrames = false;
+                    return;
+                }
+                
+                // Si el WS no está abierto, pausar con intervalo mayor
+                if (!ws || ws.readyState !== WebSocket.OPEN) {
+                    const intervalMs = Math.max(600, Math.min(3000, Number(frameIntervalInput.value) || 1200));
+                    setTimeout(sendFrame, intervalMs);
+                    return;
+                }
+
+                // Backpressure: si hay mucha cola en el socket, saltar este envío
+                if (ws.bufferedAmount > MAX_BUFFERED) {
+                    const intervalMs = Math.max(600, Math.min(3000, Number(frameIntervalInput.value) || 1200)) * 1.5;
+                    console.log(`⏳ WS congestionado (${(ws.bufferedAmount/1024).toFixed(0)}KB). Saltando frame.`);
+                    setTimeout(sendFrame, intervalMs);
+                    return;
+                }
+
+                // Si el video no está listo o ya estamos procesando, esperar al siguiente frame
+                if (video.videoWidth <= 0 || isProcessing) {
+                    requestAnimationFrame(sendFrame);
+                    return;
+                }
+
+                // Saltar frames para reducir carga
+                frameSkipCounter++;
+                if (frameSkipCounter % FRAME_SKIP !== 0) {
+                    requestAnimationFrame(sendFrame);
+                    return;
+                }
+                
+                isProcessing = true;
+                
+                // Asegurar que el canvas tenga el tamaño correcto
+                if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                }
+                
+                // Capturar con mejor timing
+                requestAnimationFrame(() => {
+                    // Dibujar el frame actual en el canvas para enviar
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                    // Recorta y envía solo el ROI alineado con el recuadro verde en pantalla
+                    const rect = getDisplayedVideoRect();
+                    const overlay = document.getElementById('scanOverlay');
+                    const overlayBox = overlay.getBoundingClientRect();
+                    const containerBox = video.parentElement.getBoundingClientRect();
+
+                    // Posición del overlay relativa al área del video mostrado
+                    const ovx = overlayBox.left - containerBox.left;
+                    const ovy = overlayBox.top - containerBox.top;
+
+                    // Mapear de píxeles mostrados -> píxeles del video fuente
+                    const scaleX = rect.vw / rect.width;
+                    const scaleY = rect.vh / rect.height;
+
+                    const sx = Math.max(0, Math.floor((ovx - rect.x) * scaleX));
+                    const sy = Math.max(0, Math.floor((ovy - rect.y) * scaleY));
+                    const sw = Math.max(1, Math.floor(overlayBox.width * scaleX));
+                    const sh = Math.max(1, Math.floor(overlayBox.height * scaleY));
+
+                    // Fuente: siempre usamos el video en tiempo real
+                    const src = video;
+
+                    // renderiza solo ROI a un canvas temporal reutilizable (mismo tamaño del ROI)
+                    if (!roiCanvas) {
+                        roiCanvas = document.createElement('canvas');
+                    }
+                    // Limitar tamaño del ROI para reducir bytes enviados
+                    const scaleDown = Math.min(1, MAX_ROI_W / Math.max(1, sw), MAX_ROI_H / Math.max(1, sh));
+                    const desiredW = Math.max(1, Math.floor(sw * scaleDown));
+                    const desiredH = Math.max(1, Math.floor(sh * scaleDown));
+                    if (roiCanvas.width !== desiredW || roiCanvas.height !== desiredH) {
+                        roiCanvas.width = desiredW;
+                        roiCanvas.height = desiredH;
+                    }
+                    const tctx = roiCanvas.getContext('2d');
+                    tctx.drawImage(src, sx, sy, sw, sh, 0, 0, roiCanvas.width, roiCanvas.height);
+
+                    // Elegir formato de salida según UI (JPEG por defecto, PNG opcional)
+                    const usePNG = !!pngModeCheckbox?.checked;
+                    const mime = usePNG ? 'image/png' : 'image/jpeg';
+                    const qRaw = parseFloat(jpegQualityInput.value);
+                    const q = isFinite(qRaw) ? Math.max(0.5, Math.min(0.95, qRaw)) : 0.85;
+
+                    roiCanvas.toBlob(b => {
+                        if (b && ws && ws.readyState === WebSocket.OPEN && !isLocked) {
+                            frameCount++; // Incrementar contador de frames
+                            ws.send(b);
+                            const fmt = usePNG ? 'PNG' : `JPEG q=${q.toFixed(2)}`;
+                            console.log(`📤 Frame #${frameCount} enviado (ROI: ${roiCanvas.width}x${roiCanvas.height}px, ${(b.size/1024).toFixed(1)}KB ${fmt})`);
+                        }
+                        isProcessing = false;
+                    }, mime, usePNG ? undefined : q);
+                });
+                
+                // Continuar enviando frames con el intervalo configurado
+                const intervalMs = Math.max(600, Math.min(3000, Number(frameIntervalInput.value) || 1200));
+                setTimeout(sendFrame, intervalMs);
+            }
+            
+            sendFrame();
+        }
+        
+        function displayResults(data) {
+            const resultsDiv = document.getElementById('barcodeResults');
+            
+            // Si ya estamos bloqueados, mantener el resultado
+            if (isLocked) {
+                return;
+            }
+            
+            // Verificar si el WebSocket está conectado
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                resultsDiv.innerHTML = `
+                    <div style="padding: 15px; background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; text-align: center;">
+                        <h4 style="margin: 0 0 10px 0; color: #856404;">⚠️ WebSocket desconectado</h4>
+                        <p style="margin: 5px 0; color: #856404;">
+                            Para iniciar el escaneo, haz clic en el botón:<br>
+                            <strong>🔌 Conectar WebSocket</strong>
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+            
+            if (data.ok && data.barcodes && data.barcodes.length > 0) {
+                const currentBarcode = data.barcodes[0]; // Tomar el primer código detectado
+                const source = Array.isArray(data.sources) && data.sources[0] ? String(data.sources[0]) : '';
+                
+                // Verificar si es el mismo código que hemos venido detectando
+                if (lockedBarcode === currentBarcode) {
+                    detectionConfidence++;
+                } else {
+                    // Código diferente o primera detección
+                    lockedBarcode = currentBarcode;
+                    detectionConfidence = 1;
+                }
+                
+                // WeChat QR y PyZbar son confiables: bloquear de inmediato
+                const isReliableSource = source.toLowerCase() === 'pyzbar' || source.toLowerCase() === 'wechat-qr';
+                const shouldLock = isReliableSource || (detectionConfidence >= CONFIDENCE_THRESHOLD);
+                if (shouldLock) {
+                    isLocked = true;
+                    
+                    let html = '<h4>🔒 ¡Código detectado y confirmado!</h4>';
+                    html += `<div class="barcode-result confirmed-result">
+                        <strong>Código:</strong> ${currentBarcode}
+                        <br><small>Detectado ${detectionConfidence} veces consecutivas</small>
+                    </div>`;
+                    html += '<button id="scanAnotherBtn" onclick="scanAnother()" style="background: #007bff; margin-top: 10px;">🔍 Escanear Otro</button>';
+                    html += '<p style="color: #666; font-size: 12px; margin-top: 5px;">📤 Envío de frames pausado para evitar spam</p>';
+                    resultsDiv.innerHTML = html;
+                    
+                    // Vibrar para indicar confirmación
+                    if (navigator.vibrate) {
+                        navigator.vibrate([100, 50, 100]);
+                    }
+                } else {
+                    // Mostrar detección temporal con contador de confianza
+                    let html = '<h4>📊 Detectando... (' + detectionConfidence + '/' + CONFIDENCE_THRESHOLD + ')</h4>';
+                    html += `<div class="barcode-result">
+                        <strong>Código detectado:</strong> ${currentBarcode}
+                        <br><small>Confirmando... Mantén enfocado</small>
+                    </div>`;
+                    resultsDiv.innerHTML = html;
+                }
+            } else {
+                // No se detectó nada, resetear contador
+                if (lockedBarcode !== null) {
+                    lockedBarcode = null;
+                    detectionConfidence = 0;
+                }
+                resultsDiv.innerHTML = '<em>Escaneando... Apunta a un código de barras o QR</em>';
+            }
+        }
+        
+        function scanAnother() {
+            // Resetear el estado de bloqueo
+            isLocked = false;
+            lockedBarcode = null;
+            detectionConfidence = 0;
+            
+            // Limpiar resultados
+            const resultsDiv = document.getElementById('barcodeResults');
+            resultsDiv.innerHTML = '<em>Escaneando... Apunta a un código de barras o QR</em>';
+            
+            // Reanudar el envío de frames si el WebSocket está conectado
+            if (ws && ws.readyState === WebSocket.OPEN && !isSendingFrames) {
+                console.log('🔓 Desbloqueando - reanudando envío de frames');
+                // Reiniciar el bucle de sendFrame ya que se detuvo completamente
+                startSendingFrames();
+            }
+        }
+        
+        // Nueva función para procesar imágenes estáticas
+        async function processStaticImage() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) return;
+            
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                const response = await fetch(REST_IMAGE_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('Resultado imagen estática:', result);
+                    displayResults({
+                        ok: result.barcodes && result.barcodes.length > 0,
+                        barcodes: result.barcodes || [],
+                        sources: result.sources || []
+                    });
+                } else {
+                    alert('Error al procesar la imagen');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error de conexión. Verifica que el servidor esté funcionando.');
+            }
+        }
+        
+        // Limpiar al cerrar la página
+        window.addEventListener('beforeunload', () => {
+            disconnectWebSocket();
+            stopCamera();
+        });
+
+        jpegQualityInput.addEventListener('input', () => {
+            const v = Math.max(0.5, Math.min(0.95, parseFloat(jpegQualityInput.value) || 0.9));
+            jpegQualityValue.textContent = v.toFixed(2);
+        });
+    </script>
+</body>
+</html>
