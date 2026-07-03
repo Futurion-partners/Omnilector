@@ -1,20 +1,20 @@
 ---
-name: Sugerencia de Característica
-about: Sugiere una idea o mejora para este proyecto
+name: Feature Suggestion
+about: Suggest an idea or improvement for this project
 title: '[FEAT] '
 labels: enhancement
 assignees: ''
 
 ---
 
-**¿Tu sugerencia está relacionada con un problema? Por favor, descríbelo**
-Una descripción clara y concisa de cuál es el problema. Ej. "Me resulta difícil..."
+**Is your suggestion related to a problem? Please describe**
+A clear and concise description of what the problem is. E.g., "I find it difficult to..."
 
-**Describe la Solución que Deseas**
-Una descripción clara y concisa de lo que quieres que suceda o de la característica que deseas agregar.
+**Describe the Solution You'd Like**
+A clear and concise description of what you want to happen or what feature you want to add.
 
-**Describe las Alternativas que has Considerado**
-Una descripción clara y concisa de cualquier solución o característica alternativa que hayas considerado.
+**Describe Alternatives You've Considered**
+A clear and concise description of any alternative solutions or features you've considered.
 
-**Contexto Adicional**
-Cualquier otro contexto o capturas de pantalla sobre la sugerencia de característica aquí.
+**Additional Context**
+Add any other context, screenshots, or details about the feature suggestion here.

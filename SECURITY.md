@@ -1,24 +1,24 @@
-# Política de Seguridad - Omnilector
+# Security Policy - Omnilector
 
-## Versiones Soportadas
+## Supported Versions
 
-Actualmente, solo proporcionamos actualizaciones de seguridad para la última versión de **Omnilector**. Recomendamos encarecidamente utilizar siempre la versión más reciente del software.
+Currently, we only provide security updates for the latest version of **Omnilector**. We strongly recommend always using the most recent version of the software.
 
-| Versión | Soportada |
+| Version | Supported |
 |---------|-----------|
-| >=1.0.0 | Sí        |
+| >=1.0.0 | Yes       |
 
 ---
 
-## Reportar una Vulnerabilidad
+## Reporting a Vulnerability
 
-Nos tomamos muy en serio la seguridad de nuestro software. Si descubres una vulnerabilidad de seguridad en **Omnilector**, te pedimos que la reportes de manera responsable para que podamos corregirla antes de que sea pública.
+We take the security of our software very seriously. If you discover a security vulnerability in **Omnilector**, we ask you to report it responsibly so that we can patch it before it becomes public.
 
-Por favor, **NO** abras una Issue pública en GitHub para reportar vulnerabilidades de seguridad.
+Please **DO NOT** open a public GitHub Issue to report security vulnerabilities.
 
-En su lugar, sigue el siguiente procedimiento:
-1. Envía un correo electrónico detallado con la vulnerabilidad a **support@futurion.com**.
-2. Incluye una descripción clara del problema, los pasos necesarios para reproducirlo (si es posible, con un ejemplo o prueba de concepto) y el impacto potencial de la vulnerabilidad.
-3. Te responderemos confirmando la recepción del reporte en un plazo máximo de 48 horas laborables y mantendremos el contacto contigo a medida que trabajemos en una solución.
+Instead, please follow this procedure:
+1. Send a detailed email about the vulnerability to **support@futurion.com**.
+2. Include a clear description of the issue, the steps needed to reproduce it (if possible, with an example or proof of concept), and the potential impact of the vulnerability.
+3. We will respond to confirm receipt of the report within 48 business hours and will remain in touch with you as we work on a fix.
 
-Agradecemos tu ayuda para mantener seguro este proyecto.
+Thank you for helping us keep this project secure.

@@ -1,279 +1,269 @@
-# 📚 Índice de Documentación - Omnilector
+# 📚 Documentation Index - Omnilector
 
-Este es el índice completo de toda la documentación disponible para el proyecto Omnilector API.
+This is the complete index of all the documentation available for the Omnilector API project.
 
 ---
 
-## 📖 Documentos Disponibles
+## 📖 Available Documents
 
-### 🚀 Para Usuarios
+### 🚀 For Users
 
-| Documento | Descripción | Recomendado para |
+| Document | Description | Recommended For |
 |-----------|-------------|------------------|
-| **[README.md](README.md)** | Visión general del proyecto y setup básico | Todos los usuarios |
-| **[QUICKSTART.md](QUICKSTART.md)** | Guía de inicio en 5 minutos | Usuarios nuevos |
+| **[README.md](../README.md)** | Project overview and basic setup | All users |
+| **[QUICKSTART.md](QUICKSTART.md)** | 5-minute start guide | New users |
 
-### 👨‍💻 Para Desarrolladores
+### 👨‍💻 For Developers
 
-| Documento | Descripción | Recomendado para |
+| Document | Description | Recommended For |
 |-----------|-------------|------------------|
-| **[DOCUMENTATION.md](DOCUMENTATION.md)** | Documentación técnica completa | Desarrolladores y administradores |
-| **[API_REFERENCE.md](API_REFERENCE.md)** | Referencia completa de la API | Desarrolladores de integraciones |
-| **[FRONTEND_GUIDE.md](FRONTEND_GUIDE.md)** | Guía del cliente web JavaScript | Desarrolladores frontend |
+| **[DOCUMENTATION.md](DOCUMENTATION.md)** | Full technical documentation | Developers and system administrators |
+| **[API_REFERENCE.md](API_REFERENCE.md)** | Comprehensive API reference | Integration developers |
+| **[FRONTEND_GUIDE.md](FRONTEND_GUIDE.md)** | JavaScript web client guide | Frontend developers |
 
 ---
 
-## 🗺️ Guía de Lectura por Objetivo
+## 🗺️ Goal-Oriented Reading Guide
 
-### "Quiero empezar a usar la aplicación YA"
+### "I want to start using the application NOW"
 
-1. **[QUICKSTART.md](QUICKSTART.md)** - Instala y ejecuta en 5 minutos
-2. Abre http://localhost:8000 en tu navegador
-3. ¡Listo para escanear!
+1. **[QUICKSTART.md](QUICKSTART.md)** - Install and run in 5 minutes.
+2. Open http://localhost:8000 in your browser.
+3. Ready to scan!
 
-### "Quiero integrar la API en mi aplicación"
+### "I want to integrate the API into my application"
 
-1. **[QUICKSTART.md](QUICKSTART.md)** - Setup del servidor
-2. **[API_REFERENCE.md](API_REFERENCE.md)** - Endpoints y ejemplos de código
-3. **[DOCUMENTATION.md](DOCUMENTATION.md)** - Sección "API Reference" para casos avanzados
+1. **[QUICKSTART.md](QUICKSTART.md)** - Server setup.
+2. **[API_REFERENCE.md](API_REFERENCE.md)** - Endpoints and code examples.
+3. **[DOCUMENTATION.md](DOCUMENTATION.md)** - "API Reference" section for advanced cases.
 
-### "Quiero entender cómo funciona el frontend"
+### "I want to understand how the frontend works"
 
-1. **[FRONTEND_GUIDE.md](FRONTEND_GUIDE.md)** - Arquitectura y funciones principales
-2. **[websocket_test.html](websocket_test.html)** - Código fuente del cliente
-3. **[DOCUMENTATION.md](DOCUMENTATION.md)** - Sección "Cliente Web"
+1. **[FRONTEND_GUIDE.md](FRONTEND_GUIDE.md)** - Architecture and key functions.
+2. **[websocket_test.html](../websocket_test.html)** - Client source code.
+3. **[DOCUMENTATION.md](DOCUMENTATION.md)** - "Web Client" section.
 
-### "Quiero desplegar en producción"
+### "I want to deploy to production"
 
-1. **[DOCUMENTATION.md](DOCUMENTATION.md)** - Sección "Despliegue en Producción"
-2. **[README.md](README.md)** - Secciones Docker y Dokploy
-3. **[API_REFERENCE.md](API_REFERENCE.md)** - Para configurar CORS y rate limiting
+1. **[DOCUMENTATION.md](DOCUMENTATION.md)** - "Production Deployment" section.
+2. **[README.md](../README.md)** - Docker and Dokploy sections.
+3. **[API_REFERENCE.md](API_REFERENCE.md)** - To configure CORS and rate limiting.
 
-### "Quiero contribuir al proyecto"
+### "I want to contribute to the project"
 
-1. **[DOCUMENTATION.md](DOCUMENTATION.md)** - Sección "Desarrollo y Contribución"
-2. **[README.md](README.md)** - Sección "Contribuir"
-3. **[FRONTEND_GUIDE.md](FRONTEND_GUIDE.md)** - Si vas a trabajar en el frontend
+1. **[DOCUMENTATION.md](DOCUMENTATION.md)** - "Development and Contribution" section.
+2. **[README.md](../README.md)** - "Contributing" section.
+3. **[FRONTEND_GUIDE.md](FRONTEND_GUIDE.md)** - If you are going to work on the frontend.
 
-### "Tengo un problema y necesito ayuda"
+### "I have a problem and need help"
 
-1. **[QUICKSTART.md](QUICKSTART.md)** - Solución rápida de problemas comunes
-2. **[DOCUMENTATION.md](DOCUMENTATION.md)** - Sección "Solución de Problemas" (extensa)
-3. **GitHub Issues** - Abre un issue si el problema persiste
+1. **[QUICKSTART.md](QUICKSTART.md)** - Quick fixes for common issues.
+2. **[DOCUMENTATION.md](DOCUMENTATION.md)** - "Troubleshooting" section (comprehensive).
+3. **GitHub Issues** - Open an issue if the problem persists.
 
 ---
 
-## 📋 Contenido por Documento
+## 📋 Content per Document
 
-### [README.md](README.md)
+### [README.md](../README.md)
 
-**Longitud**: ~260 líneas  
-**Tiempo de lectura**: 5-7 minutos
+**Length**: ~260 lines  
+**Reading time**: 5-7 minutes
 
-**Contenido**:
-- ✅ Visión general del proyecto
-- ✅ Características principales
-- ✅ Inicio rápido (resumido)
-- ✅ Setup con Docker
-- ✅ Setup con uv
-- ✅ Despliegue en Dokploy
-- ✅ Índice de documentación
-- ✅ Contribuir
-- ✅ Licencia y contacto
+**Content**:
+- ✅ Project overview
+- ✅ Key features
+- ✅ Quick start (summarized)
+- ✅ Docker setup
+- ✅ uv setup
+- ✅ Dokploy deployment
+- ✅ Documentation index
+- ✅ Contributing
+- ✅ License and contact
 
-**Cuándo leer**: Primera vez que ves el proyecto.
+**When to read**: First time you see the project.
 
 ---
 
 ### [QUICKSTART.md](QUICKSTART.md)
 
-**Longitud**: ~180 líneas  
-**Tiempo de lectura**: 5 minutos
+**Length**: ~180 lines  
+**Reading time**: 5 minutes
 
-**Contenido**:
-- ✅ Instalación paso a paso
-- ✅ Configuración recomendada
-- ✅ Uso básico (tiempo real e imagen)
-- ✅ Acceso desde móvil
-- ✅ Testing con curl
-- ✅ Solución rápida de problemas
+**Content**:
+- ✅ Step-by-step installation
+- ✅ Recommended configuration
+- ✅ Basic usage (real-time and image)
+- ✅ Mobile access
+- ✅ Testing with curl
+- ✅ Quick troubleshooting
 
-**Cuándo leer**: Quieres empezar a usar la app lo antes posible.
+**When to read**: You want to get the app running as quickly as possible.
 
 ---
 
 ### [DOCUMENTATION.md](DOCUMENTATION.md)
 
-**Longitud**: ~1200 líneas  
-**Tiempo de lectura**: 30-40 minutos (referencia completa)
+**Length**: ~1200 lines  
+**Reading time**: 30-40 minutes (full reference)
 
-**Contenido**:
-- ✅ Introducción detallada
-- ✅ Arquitectura del sistema
-- ✅ Requisitos completos
-- ✅ Instalación avanzada
-- ✅ Guía de uso completa
-- ✅ API Reference (resumen)
-- ✅ Cliente web (overview)
-- ✅ Optimización y rendimiento
-- ✅ Solución de problemas (extensa)
-- ✅ Desarrollo y contribución
-- ✅ Despliegue en producción
-- ✅ Monitoreo y métricas
+**Content**:
+- ✅ Detailed introduction
+- ✅ System architecture
+- ✅ Complete system requirements
+- ✅ Advanced installation
+- ✅ Full usage guide
+- ✅ API Reference (overview)
+- ✅ Web client (overview)
+- ✅ Optimization and performance
+- ✅ Troubleshooting (extensive)
+- ✅ Development and contribution
+- ✅ Production deployment
+- ✅ Monitoring and metrics
 
-**Cuándo leer**: Como referencia técnica completa, o cuando necesitas entender el sistema en profundidad.
+**When to read**: As a full technical reference, or when you need to understand the system in depth.
 
 ---
 
 ### [API_REFERENCE.md](API_REFERENCE.md)
 
-**Longitud**: ~650 líneas  
-**Tiempo de lectura**: 15-20 minutos
+**Length**: ~650 lines  
+**Reading time**: 15-20 minutes
 
-**Contenido**:
-- ✅ Endpoints REST detallados
+**Content**:
+- ✅ Detailed REST endpoints
 - ✅ WebSocket protocol
-- ✅ Ejemplos de código en múltiples lenguajes
-  - curl
-  - Python (requests + websockets)
-  - JavaScript (fetch + WebSocket)
-  - Node.js (axios)
-- ✅ Tipos de datos (TypeScript interfaces)
-- ✅ Códigos de error
-- ✅ CORS y rate limiting
+- ✅ Code examples in multiple languages (curl, Python, JavaScript, Node.js)
+- ✅ Data types (TypeScript interfaces)
+- ✅ Error codes
+- ✅ CORS and rate limiting
 - ✅ Testing
-- ✅ Mejores prácticas
+- ✅ Best practices
 
-**Cuándo leer**: Cuando necesitas integrar la API en tu aplicación.
+**When to read**: When you need to integrate the API into your application.
 
 ---
 
 ### [FRONTEND_GUIDE.md](FRONTEND_GUIDE.md)
 
-**Longitud**: ~1100 líneas  
-**Tiempo de lectura**: 25-30 minutos
+**Length**: ~1100 lines  
+**Reading time**: 25-30 minutes
 
-**Contenido**:
-- ✅ Arquitectura del cliente
-- ✅ Variables globales y estado
-- ✅ Funciones principales (documentadas a fondo)
-  - startCamera()
-  - selectBestBackCamera()
-  - connectWebSocket()
-  - startSendingFrames()
-  - displayResults()
-  - Sistema ROI
-- ✅ Sistema de confianza
-- ✅ Optimizaciones
-- ✅ Flujo de datos (diagrama de secuencia)
-- ✅ Mejoras futuras
+**Content**:
+- ✅ Client architecture
+- ✅ Global variables and state
+- ✅ Key functions documented in detail (`startCamera()`, `selectBestBackCamera()`, `connectWebSocket()`, `startSendingFrames()`, `displayResults()`, ROI System)
+- ✅ Confidence system
+- ✅ Optimizations
+- ✅ Data flow (sequence diagram)
+- ✅ Future improvements
 
-**Cuándo leer**: Cuando necesitas modificar o entender el cliente web JavaScript.
+**When to read**: When you need to modify or understand the JavaScript web client.
 
 ---
 
-## 🎯 Búsqueda Rápida
+## 🎯 Quick Search
 
-### Por Tema
+### By Topic
 
-#### Instalación
-- [QUICKSTART.md](QUICKSTART.md) - Sección "En 5 Minutos"
-- [README.md](README.md) - Sección "Inicio Rápido"
-- [DOCUMENTATION.md](DOCUMENTATION.md) - Sección "Instalación y Configuración"
+#### Installation
+- [QUICKSTART.md](QUICKSTART.md) - "Step by Step" section
+- [README.md](../README.md) - "Quick Start" section
+- [DOCUMENTATION.md](DOCUMENTATION.md) - "Installation and Configuration" section
 
-#### Uso de la Cámara
-- [QUICKSTART.md](QUICKSTART.md) - Sección "Uso Básico"
-- [DOCUMENTATION.md](DOCUMENTATION.md) - Sección "Guía de Uso"
-- [FRONTEND_GUIDE.md](FRONTEND_GUIDE.md) - Sección "Gestión de Cámara"
+#### Camera Usage
+- [QUICKSTART.md](QUICKSTART.md) - "Basic Usage" section
+- [DOCUMENTATION.md](DOCUMENTATION.md) - "Usage Guide" section
+- [FRONTEND_GUIDE.md](FRONTEND_GUIDE.md) - "Camera Management" section
 
-#### API REST
-- [API_REFERENCE.md](API_REFERENCE.md) - Sección "Procesar Imagen Estática"
-- [DOCUMENTATION.md](DOCUMENTATION.md) - Sección "Modo 2: API REST"
+#### REST API
+- [API_REFERENCE.md](API_REFERENCE.md) - "Process Static Image" section
+- [DOCUMENTATION.md](DOCUMENTATION.md) - "REST API Mode" section
 
 #### WebSocket
-- [API_REFERENCE.md](API_REFERENCE.md) - Sección "WebSocket en Tiempo Real"
-- [DOCUMENTATION.md](DOCUMENTATION.md) - Sección "Modo 3: WebSocket"
-- [FRONTEND_GUIDE.md](FRONTEND_GUIDE.md) - Sección "Sistema WebSocket"
+- [API_REFERENCE.md](API_REFERENCE.md) - "Real-Time WebSocket" section
+- [DOCUMENTATION.md](DOCUMENTATION.md) - "WebSocket Mode" section
+- [FRONTEND_GUIDE.md](FRONTEND_GUIDE.md) - "WebSocket System" section
 
 #### Docker
-- [README.md](README.md) - Sección "With Docker"
-- [DOCUMENTATION.md](DOCUMENTATION.md) - Sección "Opción 2: Docker"
+- [README.md](../README.md) - "With Docker" section
+- [DOCUMENTATION.md](DOCUMENTATION.md) - "Option 2: Docker" section
 
-#### Problemas Comunes
-- [QUICKSTART.md](QUICKSTART.md) - Solución rápida
-- [DOCUMENTATION.md](DOCUMENTATION.md) - Sección "Solución de Problemas" (completa)
+#### Common Issues
+- [QUICKSTART.md](QUICKSTART.md) - Quick troubleshooting
+- [DOCUMENTATION.md](DOCUMENTATION.md) - "Troubleshooting" section (complete)
 
-#### Optimización
-- [DOCUMENTATION.md](DOCUMENTATION.md) - Sección "Optimización y Rendimiento"
-- [FRONTEND_GUIDE.md](FRONTEND_GUIDE.md) - Sección "Optimizaciones"
+#### Optimization
+- [DOCUMENTATION.md](DOCUMENTATION.md) - "Optimization and Performance" section
+- [FRONTEND_GUIDE.md](FRONTEND_GUIDE.md) - "Optimizations" section
 
-#### Desarrollo
-- [DOCUMENTATION.md](DOCUMENTATION.md) - Sección "Desarrollo y Contribución"
-- [README.md](README.md) - Sección "Contribuir"
-- [FRONTEND_GUIDE.md](FRONTEND_GUIDE.md) - Sección "Mejoras Futuras"
+#### Development
+- [DOCUMENTATION.md](DOCUMENTATION.md) - "Development and Contribution" section
+- [README.md](../README.md) - "Contributing" section
+- [FRONTEND_GUIDE.md](FRONTEND_GUIDE.md) - "Future Improvements" section
 
-#### Despliegue
-- [DOCUMENTATION.md](DOCUMENTATION.md) - Sección "Despliegue en Producción"
-- [README.md](README.md) - Sección "Dokploy Deployment"
-
----
-
-## 💡 Consejos de Lectura
-
-### Para Principiantes
-
-**Ruta recomendada** (30 minutos):
-1. [QUICKSTART.md](QUICKSTART.md) completo (5 min)
-2. Probar la aplicación (10 min)
-3. [API_REFERENCE.md](API_REFERENCE.md) - Solo endpoints REST (5 min)
-4. [README.md](README.md) - Sección Docker si lo necesitas (5 min)
-5. [DOCUMENTATION.md](DOCUMENTATION.md) - Solo "Solución de Problemas" si tienes issues (5 min)
-
-### Para Desarrolladores
-
-**Ruta recomendada** (1 hora):
-1. [QUICKSTART.md](QUICKSTART.md) (5 min)
-2. [API_REFERENCE.md](API_REFERENCE.md) completo (20 min)
-3. [DOCUMENTATION.md](DOCUMENTATION.md) - Secciones técnicas (20 min)
-4. [FRONTEND_GUIDE.md](FRONTEND_GUIDE.md) - Si trabajas con el frontend (15 min)
-
-### Para Administradores de Sistemas
-
-**Ruta recomendada** (45 minutos):
-1. [QUICKSTART.md](QUICKSTART.md) (5 min)
-2. [README.md](README.md) - Setup con Docker (10 min)
-3. [DOCUMENTATION.md](DOCUMENTATION.md) - "Despliegue en Producción" (20 min)
-4. [DOCUMENTATION.md](DOCUMENTATION.md) - "Solución de Problemas" (10 min)
-
-### Para Contribuidores
-
-**Ruta recomendada** (1.5 horas):
-1. [README.md](README.md) - Overview (10 min)
-2. [DOCUMENTATION.md](DOCUMENTATION.md) - "Desarrollo y Contribución" (20 min)
-3. [DOCUMENTATION.md](DOCUMENTATION.md) - "Arquitectura del Sistema" (15 min)
-4. [API_REFERENCE.md](API_REFERENCE.md) completo (20 min)
-5. [FRONTEND_GUIDE.md](FRONTEND_GUIDE.md) completo (30 min)
+#### Deployment
+- [DOCUMENTATION.md](DOCUMENTATION.md) - "Production Deployment" section
+- [README.md](../README.md) - "Dokploy Deployment" section
 
 ---
 
-## 📊 Estadísticas de la Documentación
+## 💡 Reading Paths
 
-| Documento | Líneas | Palabras | Tiempo Lectura |
+### For Beginners
+
+**Recommended path** (30 minutes):
+1. Complete [QUICKSTART.md](QUICKSTART.md) (5 min)
+2. Play with the application (10 min)
+3. [API_REFERENCE.md](API_REFERENCE.md) - REST endpoints only (5 min)
+4. [README.md](../README.md) - Docker section if needed (5 min)
+5. [DOCUMENTATION.md](DOCUMENTATION.md) - "Troubleshooting" section only if you run into issues (5 min)
+
+### For Developers
+
+**Recommended path** (1 hour):
+1. [QUICKSTART.md](QUICKSTART.md) (5 min)
+2. Complete [API_REFERENCE.md](API_REFERENCE.md) (20 min)
+3. [DOCUMENTATION.md](DOCUMENTATION.md) - Technical sections (20 min)
+4. [FRONTEND_GUIDE.md](FRONTEND_GUIDE.md) - If working on the frontend (15 min)
+
+### For System Administrators
+
+**Recommended path** (45 minutes):
+1. [QUICKSTART.md](QUICKSTART.md) (5 min)
+2. [README.md](../README.md) - Docker Setup (10 min)
+3. [DOCUMENTATION.md](DOCUMENTATION.md) - "Production Deployment" section (20 min)
+4. [DOCUMENTATION.md](DOCUMENTATION.md) - "Troubleshooting" section (10 min)
+
+### For Contributors
+
+**Recommended path** (1.5 hours):
+1. [README.md](../README.md) - Overview (10 min)
+2. [DOCUMENTATION.md](DOCUMENTATION.md) - "Development and Contribution" section (20 min)
+3. [DOCUMENTATION.md](DOCUMENTATION.md) - "System Architecture" section (15 min)
+4. Complete [API_REFERENCE.md](API_REFERENCE.md) (20 min)
+5. Complete [FRONTEND_GUIDE.md](FRONTEND_GUIDE.md) (30 min)
+
+---
+
+## 📊 Documentation Statistics
+
+| Document | Lines | Words | Reading Time |
 |-----------|--------|----------|----------------|
 | README.md | ~260 | ~1,800 | 5-7 min |
 | QUICKSTART.md | ~180 | ~1,200 | 5 min |
 | DOCUMENTATION.md | ~1,200 | ~8,500 | 30-40 min |
 | API_REFERENCE.md | ~650 | ~4,500 | 15-20 min |
 | FRONTEND_GUIDE.md | ~1,100 | ~7,800 | 25-30 min |
-| **TOTAL** | **~3,390** | **~23,800** | **~1.5 horas** |
+| **TOTAL** | **~3,390** | **~23,800** | **~1.5 hours** |
 
 ---
 
-## 🔍 Buscar en la Documentación
+## 🔍 Search in Documentation
 
-### Por Función JavaScript
+### By JavaScript Function
 
-| Función | Documento | Línea aproximada |
+| Function | Document | Approximate Line |
 |---------|-----------|------------------|
 | `startCamera()` | [FRONTEND_GUIDE.md](FRONTEND_GUIDE.md) | ~350 |
 | `selectBestBackCamera()` | [FRONTEND_GUIDE.md](FRONTEND_GUIDE.md) | ~250 |
@@ -281,64 +271,40 @@ Este es el índice completo de toda la documentación disponible para el proyect
 | `startSendingFrames()` | [FRONTEND_GUIDE.md](FRONTEND_GUIDE.md) | ~600 |
 | `displayResults()` | [FRONTEND_GUIDE.md](FRONTEND_GUIDE.md) | ~850 |
 
-### Por Endpoint API
+### By API Endpoint
 
-| Endpoint | Documento | Sección |
+| Endpoint | Document | Section |
 |----------|-----------|---------|
 | `GET /health` | [API_REFERENCE.md](API_REFERENCE.md) | "Health Check" |
-| `POST /api/v1/image/` | [API_REFERENCE.md](API_REFERENCE.md) | "Procesar Imagen Estática" |
-| `WS /api/v1/realtime/` | [API_REFERENCE.md](API_REFERENCE.md) | "WebSocket en Tiempo Real" |
+| `POST /api/v1/image/` | [API_REFERENCE.md](API_REFERENCE.md) | "Process Static Image" |
+| `WS /api/v1/realtime/` | [API_REFERENCE.md](API_REFERENCE.md) | "Real-Time WebSocket" |
 
-### Por Error Común
+### By Common Error
 
-| Error | Documento | Sección |
+| Error | Document | Section |
 |-------|-----------|---------|
-| "No se puede acceder a la cámara" | [DOCUMENTATION.md](DOCUMENTATION.md) | "Problema 1" |
-| "Cámara frontal en lugar de trasera" | [DOCUMENTATION.md](DOCUMENTATION.md) | "Problema 2" |
-| "WebSocket desconecta" | [DOCUMENTATION.md](DOCUMENTATION.md) | "Problema 3" |
-| "No se detectan códigos" | [DOCUMENTATION.md](DOCUMENTATION.md) | "Problema 4" |
+| "Cannot access camera" | [DOCUMENTATION.md](DOCUMENTATION.md) | "Problem 1" |
+| "Front camera used instead of back" | [DOCUMENTATION.md](DOCUMENTATION.md) | "Problem 2" |
+| "WebSocket disconnects" | [DOCUMENTATION.md](DOCUMENTATION.md) | "Problem 3" |
+| "No codes detected" | [DOCUMENTATION.md](DOCUMENTATION.md) | "Problem 4" |
 
 ---
 
-## 📝 Actualizaciones
+## 📝 Updates
 
-### Última Actualización
-**Fecha**: Octubre 6, 2025  
-**Versión**: 1.0.0
+### Latest Update
+**Date**: October 6, 2025  
+**Version**: 1.0.0
 
-### Cambios Recientes
-- ✅ Documentación completa creada
-- ✅ 5 documentos principales
-- ✅ ~3,400 líneas de documentación
-- ✅ Ejemplos de código en múltiples lenguajes
-- ✅ Diagramas de arquitectura y flujo
+### Recent Changes
+- ✅ Full documentation created
+- ✅ 5 main documents
+- ✅ ~3,400 lines of documentation
+- ✅ Code examples in multiple languages
+- ✅ Architecture and flow diagrams
 
-### Próximas Actualizaciones Planeadas
-- 📝 Video tutoriales
-- 📝 FAQ extendido
-- 📝 Cookbook con recetas comunes
-- 📝 Documentación en inglés
-
----
-
-## 🆘 ¿No encuentras lo que buscas?
-
-1. **Busca en los archivos**: Usa `Ctrl+F` en tu editor
-2. **Revisa el índice**: Este documento lista todos los temas
-3. **Consulta el código**: Los archivos están bien comentados
-4. **Abre un issue**: [GitHub Issues](https://github.com/Futurion-partners/Omnilector/issues)
-5. **Contacta soporte**: support@futurion.com
-
----
-
-## 💬 Feedback
-
-¿Falta algo en la documentación? ¿Encontraste un error? ¿Algo no está claro?
-
-**Abre un issue**: [github.com/Futurion-partners/Omnilector/issues](https://github.com/Futurion-partners/Omnilector/issues)
-
-Tu feedback nos ayuda a mejorar la documentación para todos. 🙏
-
----
-
-**Feliz lectura! 📖**
+### Planned Future Updates
+- 📝 Video tutorials
+- 📝 Extended FAQ
+- 📝 Cookbook with common recipes
+- 📝 English translation *(Done!)*

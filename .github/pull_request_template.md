@@ -1,27 +1,27 @@
-## Descripción
+## Description
 
-Por favor, incluye un resumen de los cambios y el problema que se resuelve. Indica también las motivaciones y el contexto relevante.
+Please include a summary of the changes and the issue that is resolved. Please also specify relevant motivations and context.
 
-## Tipo de Cambio
+## Type of Change
 
-Por favor, marca las opciones aplicables:
+Please mark the applicable options:
 
-- [ ] Corrección de error (bug fix) que no rompe compatibilidad.
-- [ ] Nueva característica (new feature) que no rompe compatibilidad.
-- [ ] Cambio importante (breaking change) que rompe compatibilidad con versiones anteriores.
-- [ ] Cambios en la documentación.
+- [ ] Bug fix (non-breaking change which fixes an issue).
+- [ ] New feature (non-breaking change which adds functionality).
+- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected).
+- [ ] Documentation update.
 
-## Cómo se ha probado
+## How Has This Been Tested?
 
-Describe las pruebas que has realizado para verificar tus cambios.
+Please describe the tests that you ran to verify your changes.
 
-1. *Prueba A*
-2. *Prueba B*
+1. *Test A*
+2. *Test B*
 
-## Lista de Verificación (Checklist)
+## Checklist
 
-- [ ] Mi código sigue las pautas de estilo de este proyecto.
-- [ ] He realizado una auto-revisión de mi propio código.
-- [ ] He comentado mi código, especialmente en las partes difíciles de entender.
-- [ ] He actualizado la documentación correspondiente a mis cambios.
-- [ ] Mis cambios no generan nuevas advertencias (warnings).
+- [ ] My code follows the style guidelines of this project.
+- [ ] I have performed a self-review of my own code.
+- [ ] I have commented my code, particularly in hard-to-understand areas.
+- [ ] I have made corresponding changes to the documentation.
+- [ ] My changes generate no new warnings.

@@ -1,98 +1,97 @@
-# 📷 Omnilector - API de Detección de Códigos de Barras
+# 📷 Omnilector - Barcode & QR Code Detection API
 
-Procesa varios tipos de códigos de barras y QR con facilidad. La API ofrece procesamiento de imágenes estáticas mediante REST y detección en tiempo real a través de WebSockets.
+Process various types of barcodes and QR codes with ease. This API offers static image processing via REST and real-time detection through WebSockets.
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![Python](https://img.shields.io/badge/python-3.13+-green)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.116+-orange)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
-## ✨ Características Principales
+## ✨ Key Features
 
-- 🔍 **Multi-motor de detección**: PyZbar, ZXing-C++ y OpenCV WeChat QR
-- 📡 **WebSocket streaming**: Detección en tiempo real con baja latencia
-- 🖼️ **API REST**: Procesamiento de imágenes estáticas
-- 🎯 **ROI dinámico**: Enfoque en región de interés para mayor precisión
-- ✅ **Sistema de confianza**: Confirmación de códigos detectados
-- 🐳 **Docker ready**: Listo para contenedores
-- 📚 **Documentación completa**: Swagger UI integrado
+- 🔍 **Multi-engine detection**: PyZbar, ZXing-C++, and OpenCV WeChat QR.
+- 📡 **WebSocket streaming**: Real-time detection with low latency.
+- 🖼️ **REST API**: Static image processing.
+- 🎯 **Dynamic ROI**: Focus on a Region of Interest for higher accuracy.
+- ✅ **Confidence system**: Confirmation of detected codes over consecutive frames.
+- 🐳 **Docker ready**: Containerization ready.
+- 📚 **Full documentation**: Integrated Swagger UI.
 
-## 📋 Formatos Soportados
+## 📋 Supported Formats
 
-### Códigos de Barras 1D
+### 1D Barcodes
 EAN-8, EAN-13, UPC-A, UPC-E, Code 39, Code 93, Code 128, ITF, Codabar
 
-### Códigos 2D
+### 2D Codes
 QR Code, Aztec Code, DataMatrix, PDF417
 
 ---
 
-## 🚀 Inicio Rápido
+## 🚀 Quick Start
 
 ```bash
-# 1. Instalar uv
+# 1. Install uv
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# 2. Clonar proyecto
+# 2. Clone the project
 git clone https://github.com/Futurion-partners/Omnilector.git
 cd Omnilector
 
-# 3. Instalar dependencias
+# 3. Install dependencies
 uv sync
 
-# 4. Ejecutar servidor
+# 4. Run the server
 uv run omnilector-dev
 
-# 5. Abrir navegador
+# 5. Open browser
 # http://localhost:8000
 ```
 
-Ver **[QUICKSTART.md](QUICKSTART.md)** para instrucciones detalladas.
+See **[QUICKSTART.md](documentation/QUICKSTART.md)** for detailed instructions.
 
 ---
 
-## 📚 Documentación Completa
+## 📚 Full Documentation
 
-| Documento | Descripción |
+| Document | Description |
 |-----------|-------------|
-| **[QUICKSTART.md](QUICKSTART.md)** | ⏱️ Guía de inicio en 5 minutos |
-| **[DOCUMENTATION.md](DOCUMENTATION.md)** | 📖 Documentación técnica completa |
-| **[API_REFERENCE.md](API_REFERENCE.md)** | 📡 Referencia de la API REST y WebSocket |
-| **[FRONTEND_GUIDE.md](FRONTEND_GUIDE.md)** | 🎨 Guía del cliente web JavaScript |
+| **[QUICKSTART.md](documentation/QUICKSTART.md)** | ⏱️ 5-minute start guide |
+| **[DOCUMENTATION.md](documentation/DOCUMENTATION.md)** | 📖 Full technical documentation |
+| **[API_REFERENCE.md](documentation/API_REFERENCE.md)** | 📡 REST and WebSocket API Reference |
+| **[FRONTEND_GUIDE.md](documentation/FRONTEND_GUIDE.md)** | 🎨 JavaScript Web Client Guide |
 
 ---
 
-## 📋 Tabla de Contenidos
+## 📋 Table of Contents
 
 - [Omnilector](#omnilector)
-  - [Inicio Rápido](#inicio-rápido)
-  - [Documentación Completa](#documentación-completa)
-  - [Tabla de Contenidos](#tabla-de-contenidos)
-  - [Ejecutar y Configurar el Proyecto](#ejecutar-y-configurar-el-proyecto)
-    - [Con Docker](#con-docker)
-      - [Ejecutar la Imagen Docker](#ejecutar-la-imagen-docker)
-        - [Construir la Imagen Docker](#construir-la-imagen-docker)
-        - [Ejecutar la API](#ejecutar-la-api)
-          - [Modificar Puertos](#modificar-puertos)
-    - [Desarrollo Local](#desarrollo-local)
-      - [Configuración Local](#configuración-local)
-      - [Ejecutar Localmente](#ejecutar-localmente)
-        - [Recarga Activada](#recarga-activada)
-        - [Recarga Desactivada](#recarga-desactivada)
+  - [Quick Start](#quick-start)
+  - [Full Documentation](#full-documentation)
+  - [Table of Contents](#table-of-contents)
+  - [Run and Configure the Project](#run-and-configure-the-project)
+    - [With Docker](#with-docker)
+      - [Build the Docker Image](#build-the-docker-image)
+      - [Run the API](#run-the-api)
+        - [Modify Ports](#modify-ports)
+    - [Local Development](#local-development)
+      - [Local Configuration](#local-configuration)
+      - [Run Locally](#run-locally)
+        - [Reload Enabled](#reload-enabled)
+        - [Reload Disabled](#reload-disabled)
 
 ---
 
-## 🎯 Uso Básico
+## 🎯 Basic Usage
 
-### Interfaz Web (Recomendado)
+### Web Interface (Recommended)
 
-1. Inicia el servidor: `uv run omnilector-dev`
-2. Abre http://localhost:8000 en tu navegador
-3. Haz clic en "📷 Iniciar Cámara"
-4. Haz clic en "🔌 Conectar WebSocket"
-5. Apunta tu cámara al código de barras
+1. Start the server: `uv run omnilector-dev`
+2. Open http://localhost:8000 in your browser.
+3. Click "📷 Start Camera".
+4. Click "🔌 Connect WebSocket".
+5. Point your camera at a barcode.
 
-### API REST
+### REST API
 
 ```bash
 curl -X POST "http://localhost:8000/api/v1/image/" \
@@ -110,151 +109,123 @@ response = requests.post(url, files=files)
 print(response.json())
 ```
 
-Ver **[API_REFERENCE.md](API_REFERENCE.md)** para más ejemplos.
+See **[API_REFERENCE.md](documentation/API_REFERENCE.md)** for more examples.
 
 ---
 
-## 🛠️ Ejecutar y Configurar el Proyecto
+## 🛠️ Run and Configure the Project
 
-### Con Docker
+### With Docker
 
-Es posible que desees regenerar el archivo `.dockerignore` si modificaste
-los archivos `.gitignore` o `.prodignore`. Puedes hacerlo ejecutando
-los siguientes comandos:
+You may want to regenerate the `.dockerignore` file if you have modified `.gitignore` or `.prodignore`. You can do so by running the following command:
 
 > [!NOTE]
-> Este comando sobrescribirá el archivo `.dockerignore` con todo el
-> contenido de los archivos `.gitignore` y `.prodignore`.
+> This command will overwrite the `.dockerignore` file with the entire contents of the `.gitignore` and `.prodignore` files.
 
 ```sh
 cat .gitignore .prodignore > .dockerignore
 ```
 
-#### Ejecutar la Imagen Docker
-
-##### Construir la Imagen Docker
+#### Build the Docker Image
 
 ```sh
-docker build -t omnilector:$(git rev-parse --short HEAD) . # Etiquetar con el hash del commit actual
-docker build -t omnilector:latest . # Etiquetar como latest
+docker build -t omnilector:$(git rev-parse --short HEAD) . # Tag with current commit hash
+docker build -t omnilector:latest . # Tag as latest
 ```
 
-##### Ejecutar la API
+#### Run the API
 
-Una vez que hayas [construido](#construir-la-imagen-docker) la imagen, puedes ejecutar
-el siguiente comando:
+Once you have [built](#build-the-docker-image) the image, run:
 
 ```sh
 docker run --rm -p 8000:8000 omnilector:latest
 ```
 
-Ahora puedes ir a la [documentación generada](http://127.0.0.1:8000/docs)
-y revisar la API.
+Now you can visit the [generated documentation](http://127.0.0.1:8000/docs) and check out the API.
 
-###### Modificar Puertos
+##### Modify Ports
 
-Puedes configurar un puerto estableciendo una variable de entorno `PORT` al
-número de puerto deseado.
+You can configure the port by setting the `PORT` environment variable to the desired port number.
 
-Por defecto está configurado en `8000`. En caso de que quieras cambiar el
-número de puerto interno, puedes hacerlo ejecutando el siguiente comando,
-que establecerá el número de puerto en `8080` y luego mapeará el puerto `80` de
-la máquina host al puerto `8080` del contenedor.
+By default, it is set to `8000`. If you want to change the internal port, you can run the following command, which sets the internal port to `8080` and maps port `80` of the host to port `8080` of the container.
 
 ```bash
 docker run --rm -e PORT=8080 -p 80:8080 omnilector:latest
 ```
 
-Y la API debería ser accesible en
-[http://127.0.0.1:80/](http://127.0.0.1:80/docs)
+The API should now be accessible at [http://127.0.0.1:80/docs](http://127.0.0.1:80/docs).
 
-##### Usar docker-compose
+##### Using docker-compose
 
-Alternativamente, puedes usar docker-compose para construir y ejecutar:
+Alternatively, you can use docker-compose to build and run the services:
 
 ```bash
 docker compose up --build
 ```
 
-Esto expone el servicio en http://localhost:8000 e incluye un healthcheck.
+This exposes the service on http://localhost:8000 and includes a health check.
 
 ---
 
 ## 📡 Endpoints
 
-| Endpoint | Método | Descripción |
+| Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/` | GET | Redirige a `/test` |
-| `/test` | GET | Cliente web completo |
-| `/docs` | GET | Documentación interactiva (Swagger) |
-| `/health` | GET | Health check |
-| `/api/v1/image/` | POST | Procesar imagen estática |
-| `/api/v1/realtime/` | WebSocket | Detección en tiempo real |
+| `/` | GET | Redirects to `/test` |
+| `/test` | GET | Web test client |
+| `/docs` | GET | Interactive Swagger UI documentation |
+| `/health` | GET | Health check status |
+| `/api/v1/image/` | POST | Process static image |
+| `/api/v1/realtime/` | WebSocket | Real-time detection |
 
 ---
 
-## 🐳 Despliegue en Dokploy
+## 🐳 Deployment on Dokploy
 
-Para desplegar en [Dokploy](https://dokploy.com/), un PaaS auto-hospedado:
+To deploy on [Dokploy](https://dokploy.com/) (a self-hosted PaaS):
 
-1. **Construir y Desplegar**: Sube tu código a tu repositorio Git. Dokploy construirá usando el Dockerfile o pyproject.toml.
+1. **Build and Deploy**: Push your code to your Git repository. Dokploy will build using either the Dockerfile or pyproject.toml.
+2. **Dependencies**: Ensure all dependencies are listed in `pyproject.toml`. If you encounter a `ModuleNotFoundError`, check build logs and redeploy after adding the missing packages (e.g., `pillow` was added for image processing).
+3. **Environment Variables**:
+   - Set `BARCODE_ONLY_PYZBAR=1` to prioritize PyZbar (default).
+   - Adjust `PORT` if needed (defaults to 8000).
+4. **Troubleshooting**:
+   - **Missing Modules**: If build fails due to import errors, add the missing package to `pyproject.toml` dependencies and redeploy.
+   - **Version Verification**: After deploying, visit `/api/v1/version` to confirm that the app started successfully and check the version.
+   - **Logs**: Check Dokploy logs for errors like "No module named 'PIL'". This indicates Pillow is not installed; add `pillow>=12.0.0` to dependencies.
+   - **Redeploy**: Force a rebuild by pushing a new commit or trigger a manual build in Dokploy.
+   - **Health Check**: The app includes a health check endpoint at `/health` (if configured in the Dockerfile).
 
-2. **Dependencias**: Asegúrate de que todas las dependencias estén listadas en `pyproject.toml`. Si encuentras `ModuleNotFoundError`, revisa los logs de construcción y redespliega después de agregar los paquetes faltantes (ej: `pillow` fue agregado para procesamiento de imágenes).
-
-3. **Variables de Entorno**:
-   - Establece `BARCODE_ONLY_PYZBAR=1` para priorizar PyZbar (por defecto).
-   - Ajusta `PORT` si es necesario (por defecto 8000).
-
-4. **Solución de Problemas**:
-   - **Módulos Faltantes**: Si la construcción falla con errores de importación, agrega el paquete faltante a las dependencias de `pyproject.toml` y redespliega.
-   - **Verificación de Versión**: Después del despliegue, visita `/api/v1/version` para confirmar la versión y que la app se inició correctamente.
-    - **Logs**: Revisa los logs de Dokploy para errores como "No module named 'PIL'" – indica que Pillow no está instalado; agrega `pillow>=12.0.0` a las dependencias.
-   - **Redesplegar**: Fuerza una reconstrucción enviando un nuevo commit o activando una reconstrucción manual en Dokploy.
-   - **Health**: La app incluye un endpoint de healthcheck en `/health` (si está configurado en el Dockerfile).
-
-### Desarrollo Local
+### Local Development
 
 > [!TIP]
-> Si no estás familiarizado con [uv](https://docs.astral.sh/uv/),
-> puedes revisar [este video](https://youtu.be/AMdG7IjgSPM)
+> If you are not familiar with [uv](https://docs.astral.sh/uv/), you can watch [this video](https://youtu.be/AMdG7IjgSPM).
 
-#### Configuración Local
+#### Local Configuration
 
-1. Instala
-[uv](https://docs.astral.sh/uv/getting-started/installation/) si no está
-presente en tu máquina
-
-1. Instala/Sincroniza los paquetes requeridos
-
+1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/) if it is not already present on your machine.
+2. Synchronize the required packages:
     ```sh
     uv sync
     ```
 
-¡Y eso es todo!
+And you are good to go!
 
-#### Ejecutar Localmente
+#### Run Locally
 
-Para ejecutar los siguientes comandos, primero debes
-[configurar este proyecto localmente](#configuración-local). Más importante aún,
-debes tener tus paquetes sincronizados.
+To run the following commands, you must first [configure the project locally](#local-configuration) and ensure your packages are synced.
 
-Una vez que hayas hecho eso, puedes:
+##### Reload Enabled
 
-Ejecutar con recarga [activada](#recarga-activada) o
-[desactivada](#recarga-desactivada)
-
-##### Recarga Activada
-
-Esto actualizará la instancia de la API una vez que un archivo haya sido actualizado
+This will automatically reload the API instance once a file is updated:
 
 ```sh
 uv run omnilector-dev
 ```
 
-##### Recarga Desactivada
+##### Reload Disabled
 
-Esto ejecutará la API con el estado actual del proyecto y **no**
-se actualizará cuando modifiques tu código.
+This runs the API with the current state of the project and will **not** reload on code modifications:
 
 ```sh
 uv run omnilector
@@ -265,77 +236,74 @@ uv run omnilector
 ## 🧪 Testing
 
 ```bash
-# Ejecutar tests
+# Run tests
 pytest
 
-# Con cobertura
+# Run tests with coverage
 pytest --cov=src/omnilector
 
-# Tests de integración
+# Run integration tests
 pytest tests/integration/
 ```
 
 ---
 
-## 🤝 Contribuir
+## 🤝 Contributing
 
-Por favor, revisa nuestra **[Guía de Contribución (CONTRIBUTING.md)](CONTRIBUTING.md)** para conocer el proceso detallado para enviar contribuciones al proyecto.
-
----
-
-## 📊 Rendimiento
-
-- **Latencia API REST**: ~50-80 ms por imagen
-- **Latencia WebSocket**: ~100-150 ms total
-- **Throughput**: ~10-15 detecciones/segundo por conexión
-- **Tasa de detección**: 95-98% para códigos comunes
+Please refer to our **[Contributing Guide (CONTRIBUTING.md)](CONTRIBUTING.md)** for details on the process for submitting contributions to the project.
 
 ---
 
-## 🔧 Variables de Entorno
+## 📊 Performance
+
+- **REST API Latency**: ~50-80 ms per image
+- **WebSocket Latency**: ~100-150 ms total
+- **Throughput**: ~10-15 detections/second per connection
+- **Detection Rate**: 95-98% for common codes
+
+---
+
+## 🔧 Environment Variables
 
 ```env
-PORT=8000                    # Puerto del servidor
-HOST=0.0.0.0                 # Host del servidor
-LOG_LEVEL=info               # Nivel de logging
-BARCODE_ONLY_PYZBAR=0        # Solo usar PyZbar (1=sí, 0=no)
+PORT=8000                    # Server port
+HOST=0.0.0.0                 # Server host
+LOG_LEVEL=info               # Logging level
+BARCODE_ONLY_PYZBAR=0        # Only use PyZbar (1=yes, 0=no)
 ```
 
 ---
 
-## 🆘 Solución de Problemas
+## 🆘 Troubleshooting
 
-### No se detectan códigos
-- ✅ Verifica que el código esté dentro del recuadro verde
-- ✅ Mejora la iluminación
-- ✅ Aumenta la calidad JPEG a 0.90-0.95
-- ✅ Activa "Modo PNG sin pérdida"
+### Codes are not detected
+- ✅ Verify the code is within the green ROI box.
+- ✅ Improve the lighting.
+- ✅ Increase JPEG quality to 0.90-0.95.
+- ✅ Enable "Lossless PNG Mode".
 
-### Cámara no funciona
-- ✅ Permite permisos de cámara en el navegador
-- ✅ Usa HTTPS en producción
-- ✅ Prueba con otro navegador (Chrome recomendado)
+### Camera does not work
+- ✅ Grant camera permissions in the browser.
+- ✅ Use HTTPS in production (localhost works with HTTP).
+- ✅ Close other apps that might be using the camera.
 
-Ver **[DOCUMENTATION.md](DOCUMENTATION.md)** sección "Solución de Problemas" para más casos.
-
----
-
-## 📄 Licencia
-
-Este proyecto está bajo la licencia MIT.
+See **[DOCUMENTATION.md](documentation/DOCUMENTATION.md)** "Troubleshooting" section for more cases.
 
 ---
 
-## 👥 Autores
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+## 👥 Authors
 
 - **Futurion Partners** - [@Futurion-partners](https://github.com/Futurion-partners)
 
 ---
 
-## 📞 Soporte
+## 📞 Support
 
 - **GitHub Issues**: [github.com/Futurion-partners/Omnilector/issues](https://github.com/Futurion-partners/Omnilector/issues)
 - **Email**: support@futurion.com
-
-
-

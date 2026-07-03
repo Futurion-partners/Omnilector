@@ -1,64 +1,64 @@
-# 📚 Documentación Completa - Omnilector API
+# 📚 Complete Technical Documentation - Omnilector API
 
-## 📋 Tabla de Contenidos
+## 📋 Table of Contents
 
-1. [Introducción](#-introducción)
-2. [Características](#-características)
-3. [Arquitectura del Sistema](#-arquitectura-del-sistema)
-4. [Requisitos del Sistema](#-requisitos-del-sistema)
-5. [Instalación y Configuración](#-instalación-y-configuración)
-6. [Guía de Uso](#-guía-de-uso)
+1. [Introduction](#-introduction)
+2. [Features](#-features)
+3. [System Architecture](#-system-architecture)
+4. [System Requirements](#-system-requirements)
+5. [Installation and Configuration](#-installation-and-configuration)
+6. [Usage Guide](#-usage-guide)
 7. [API Reference](#-api-reference)
-8. [Cliente Web (Frontend)](#-cliente-web-frontend)
-9. [Optimización y Rendimiento](#-optimización-y-rendimiento)
-10. [Solución de Problemas](#-solución-de-problemas)
-11. [Desarrollo y Contribución](#-desarrollo-y-contribución)
-12. [Despliegue en Producción](#-despliegue-en-producción)
+8. [Web Client (Frontend)](#-web-client-frontend)
+9. [Optimization and Performance](#-optimization-and-performance)
+10. [Troubleshooting](#-troubleshooting)
+11. [Development and Contribution](#-development-and-contribution)
+12. [Production Deployment](#-production-deployment)
 
 ---
 
-## 🎯 Introducción
+## 🎯 Introduction
 
-**Omnilector** es una API moderna y eficiente para la detección y decodificación de códigos de barras y códigos QR en tiempo real. Desarrollada con **FastAPI** y **Python 3.13**, ofrece dos modos de operación:
+**Omnilector** is a modern and efficient API for real-time barcode and QR code detection and decoding. Developed using **FastAPI** and **Python 3.13**, it offers two operating modes:
 
-- **Modo Imagen**: Procesamiento de imágenes estáticas mediante API REST
-- **Modo Tiempo Real**: Detección continua mediante WebSockets con transmisión de video
+- **Image Mode**: Static image processing via a REST API.
+- **Real-Time Mode**: Continuous detection via WebSockets with video stream frame-by-frame transmission.
 
-### ¿Para qué sirve?
+### Use Cases
 
-- Escaneo de códigos de barras 1D (EAN, UPC, Code128, etc.)
-- Lectura de códigos QR
-- Detección de códigos Aztec y DataMatrix
-- Aplicaciones de inventario en tiempo real
-- Control de acceso con códigos QR
-- Sistemas de punto de venta (POS)
-- Validación de productos
+- Scanning 1D barcodes (EAN, UPC, Code128, etc.).
+- Reading QR codes.
+- Detecting Aztec and DataMatrix codes.
+- Real-time inventory tracking applications.
+- Access control systems utilizing QR codes.
+- Point of sale (POS) systems.
+- Product validation apps.
 
 ---
 
-## ✨ Características
+## ✨ Features
 
-### Técnicas
+### Technical Highlights
 
-- ✅ **Multi-motor de detección**: Combina PyZbar, ZXing-C++ y OpenCV WeChat QR
-- ✅ **WebSocket streaming**: Detección en tiempo real con baja latencia
-- ✅ **API REST**: Procesamiento por lotes de imágenes
-- ✅ **ROI dinámico**: Enfoque en región de interés para mayor precisión
-- ✅ **Sistema de confianza**: Confirmación de códigos detectados consecutivamente
-- ✅ **Backpressure control**: Manejo inteligente de carga en el servidor
-- ✅ **CORS habilitado**: Uso desde cualquier origen
-- ✅ **Health checks**: Monitoreo de disponibilidad
+- ✅ **Multi-engine detection**: Combines PyZbar, ZXing-C++, and OpenCV WeChat QR.
+- ✅ **WebSocket streaming**: Real-time detection with low latency.
+- ✅ **REST API**: Static image processing.
+- ✅ **Dynamic ROI**: Focus on a Region of Interest for higher accuracy and less bandwidth.
+- ✅ **Confidence system**: Consecutive identical detections confirm the barcode to prevent scan flickering.
+- ✅ **Backpressure control**: Client-side throttle if the socket output buffer congests.
+- ✅ **CORS enabled**: Straightforward frontend calls from any origin.
+- ✅ **Health checks**: Simple monitoring endpoints for system availability.
 
-### Formatos Soportados
+### Supported Formats
 
-#### Códigos de Barras 1D
+#### 1D Barcodes
 - EAN-8, EAN-13
 - UPC-A, UPC-E
 - Code 39, Code 93, Code 128
 - ITF (Interleaved 2 of 5)
 - Codabar
 
-#### Códigos 2D
+#### 2D Codes
 - QR Code
 - Aztec Code
 - DataMatrix
@@ -66,18 +66,18 @@
 
 ---
 
-## 🏗️ Arquitectura del Sistema
+## 🏗️ System Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Cliente Web (HTML5)                       │
+│                    Web Client (HTML5)                       │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
 │  │   Camera     │  │  WebSocket   │  │  File Upload │      │
 │  │   Capture    │  │   Client     │  │   REST API   │      │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘      │
-└─────────┼──────────────────┼──────────────────┼─────────────┘
-          │                  │                  │
-          ▼                  ▼                  ▼
+│  └───────┬──────┘  └──────┬───────┘  └──────┬───────┘      │
+└──────────┼────────────────┼─────────────────┼──────────────┘
+           │                │                 │
+           ▼                ▼                 ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                    FastAPI Server                            │
 │  ┌────────────────────────────────────────────────────┐     │
@@ -109,33 +109,33 @@
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Flujo de Datos
+### Data Flow
 
-#### Modo REST (Imagen Estática)
+#### REST Mode (Static Image)
 ```
-Cliente → Upload File → /api/v1/image → process_image() → 
-→ Detectores (PyZbar/ZXing/OpenCV) → JSON Response → Cliente
+Client → Upload File → /api/v1/image → process_image() → 
+→ Engines (PyZbar/ZXing/OpenCV) → JSON Response → Client
 ```
 
-#### Modo WebSocket (Tiempo Real)
+#### WebSocket Mode (Real-Time)
 ```
-Cliente → Captura Frame → ROI Crop → WebSocket Send → 
+Client → Capture Frame → ROI Crop → WebSocket Send → 
 → Server Queue → process_image() → WebSocket Response → 
 → Display Results → Next Frame
 ```
 
 ---
 
-## 💻 Requisitos del Sistema
+## 💻 System Requirements
 
-### Backend (Servidor)
+### Backend (Server)
 
 #### Software
-- **Python**: 3.13 o superior
-- **uv**: Gestor de paquetes (recomendado)
-- **Docker**: 20.10+ (opcional, para contenedores)
+- **Python**: 3.13 or higher
+- **uv**: Package manager (recommended)
+- **Docker**: 20.10+ (optional, for containerized environments)
 
-#### Dependencias Python
+#### Python Dependencies
 ```toml
 fastapi[standard]>=0.135.2
 opencv-contrib-python-headless>=4.13.0.92
@@ -144,48 +144,48 @@ pyzbar>=0.1.9
 zxing-cpp>=3.0.0
 ```
 
-#### Bibliotecas del Sistema (Linux)
+#### Linux System Packages
 ```bash
-libzbar0          # Para PyZbar
-libglib2.0-0      # Para OpenCV
-libsm6            # Para procesamiento de imágenes
-libxext6          # Extensiones X11
-libxrender1       # Renderizado
+libzbar0          # For PyZbar
+libglib2.0-0      # For OpenCV
+libsm6            # For image handling dependencies
+libxext6          # X11 extensions
+libxrender1       # Rendering support
 libgomp1          # OpenMP
-libstdc++6        # Librerías estándar C++
+libstdc++6        # Standard C++ library
 ```
 
-#### Hardware Recomendado
-- **CPU**: 2+ cores (4+ recomendado)
-- **RAM**: 2 GB mínimo (4 GB recomendado)
-- **Red**: 100 Mbps+ para streaming de video
+#### Recommended Hardware
+- **CPU**: 2+ cores (4+ cores recommended)
+- **RAM**: 2 GB minimum (4 GB recommended)
+- **Network**: 100 Mbps+ bandwidth for smooth video stream frames
 
-### Frontend (Cliente)
+### Frontend (Client)
 
-#### Navegadores Compatibles
-- ✅ Chrome 90+ (recomendado)
+#### Supported Browsers
+- ✅ Chrome 90+ (recommended)
 - ✅ Firefox 88+
 - ✅ Safari 14+ (iOS 14+)
 - ✅ Edge 90+
-- ⚠️ Opera 76+ (con limitaciones)
+- ⚠️ Opera 76+ (with limitations)
 
-#### APIs Requeridas
-- **getUserMedia**: Acceso a cámara
-- **WebSocket**: Comunicación en tiempo real
-- **Canvas API**: Procesamiento de imágenes
-- **Blob API**: Conversión de imágenes
+#### Required Web APIs
+- **getUserMedia**: Access to camera streams.
+- **WebSocket**: Real-time full-duplex communication.
+- **Canvas API**: Raw frame capturing and processing.
+- **Blob API**: Compressing and formatting images.
 
-#### Permisos
--  **Cámara**: Necesario para modo tiempo real
--  **HTTPS**: Requerido en producción para acceso a cámara
+#### Permissions
+- **Camera**: Essential for real-time streaming scans.
+- **HTTPS**: Required in production environments to access browser camera APIs.
 
 ---
 
-##  Instalación y Configuración
+## ⚙️ Installation and Configuration
 
-### Opción 1: Desarrollo Local con uv
+### Option 1: Local Development with uv
 
-#### Paso 1: Instalar uv
+#### Step 1: Install uv
 ```bash
 # Linux/macOS
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -193,117 +193,117 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 # Windows (PowerShell)
 powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 
-# Con pip
+# With pip
 pip install uv
 ```
 
-#### Paso 2: Clonar el repositorio
+#### Step 2: Clone the Repository
 ```bash
 git clone https://github.com/Futurion-partners/Omnilector.git
 cd Omnilector
 ```
 
-#### Paso 3: Instalar dependencias
+#### Step 3: Sync Dependencies
 ```bash
 uv sync
 ```
 
-#### Paso 4: Ejecutar el servidor
+#### Step 4: Run the Server
 ```bash
-# Modo desarrollo (con auto-reload)
+# Development mode (with auto-reload)
 uv run omnilector-dev
 
-# Modo producción
+# Production mode
 uv run omnilector
 ```
 
-El servidor estará disponible en:
-- API: `http://localhost:8000`
-- Documentación interactiva: `http://localhost:8000/docs`
-- Cliente web: `http://localhost:8000/test`
+The server will start and be available at:
+- API Base: `http://localhost:8000`
+- Swagger UI: `http://localhost:8000/docs`
+- Web Client: `http://localhost:8000/test`
 
-### Opción 2: Docker
+### Option 2: Docker
 
-#### Construir imagen
+#### Build Image
 ```bash
-# Con tag de commit
+# Tag with current commit hash
 docker build -t omnilector:$(git rev-parse --short HEAD) .
 
-# Como latest
+# Tag as latest
 docker build -t omnilector:latest .
 ```
 
-#### Ejecutar contenedor
+#### Run Container
 ```bash
-# Puerto por defecto (8000)
+# Default port (8000)
 docker run --rm -p 8000:8000 omnilector:latest
 
-# Puerto personalizado
+# Custom port
 docker run --rm -e PORT=8080 -p 80:8080 omnilector:latest
 ```
 
-#### Docker Compose
+#### Using Docker Compose
 ```bash
 docker compose up --build
 ```
 
-### Opción 3: Despliegue en Dokploy
+### Option 3: Deploy on Dokploy
 
-1. **Conectar repositorio**: Vincula tu repositorio Git
-2. **Variables de entorno**:
+1. **Link Repository**: Connect your Git repository.
+2. **Environment Variables**:
    ```env
    PORT=8000
-   BARCODE_ONLY_PYZBAR=1  # Opcional: priorizar PyZbar
+   BARCODE_ONLY_PYZBAR=1  # Optional: force PyZbar priority
    ```
-3. **Construir y desplegar**: Dokploy detectará automáticamente el Dockerfile
-4. **Verificar**: Accede a `/health` para confirmar el estado
+3. **Build & Deploy**: Dokploy will auto-detect the Dockerfile.
+4. **Verification**: Query `/health` to confirm successful deployment.
 
 ---
 
-## 📖 Guía de Uso
+## 📖 Usage Guide
 
-### Modo 1: Cliente Web (Recomendado)
+### Mode 1: Web Client (Recommended)
 
-#### Acceso
-Navega a `http://localhost:8000/test` o simplemente `http://localhost:8000/`
+#### Access
+Open your browser and go to `http://localhost:8000/test` or `http://localhost:8000/`.
 
-#### Configuración Inicial
-1. **Resolución**: Selecciona según la calidad de los códigos
-   - `960x720`: Códigos pequeños o rápidos
-   - `1280x720`: Balance ideal (recomendado)
-   - `1920x1080`: Códigos muy pequeños o alta precisión
+#### Initial Configuration
+1. **Resolution**: Select based on code size and quality.
+   - `960x720`: Fast, good for small screens.
+   - `1280x720`: Optimal balance (recommended).
+   - `1920x1080`: High precision, for very small barcodes.
 
-2. **Calidad JPEG**: Ajusta el slider (0.5 - 0.95)
-   - `0.85-0.90`: Recomendado para la mayoría
-   - `0.95`: Máxima calidad (más bytes)
-   - `0.70`: Menor calidad pero más rápido
+2. **JPEG Quality**: Adjust the slider (0.5 to 0.95).
+   - `0.85-0.90`: Recommended default.
+   - `0.95`: High quality, larger payload size.
+   - `0.70`: Low quality, very fast transfer.
 
-3. **Intervalo**: Tiempo entre frames (ms)
-   - `800-1000ms`: Escaneo rápido
-   - `1200ms`: Balance óptimo
-   - `1500-2000ms`: Conexiones lentas
+3. **Interval**: Time between captured frames in ms.
+   - `800-1000ms`: Rapid scanning.
+   - `1200ms`: Balanced default.
+   - `1500-2000ms`: Slow network connections.
 
-4. **Opciones avanzadas**:
-   - ☑️ **Enfoque automático**: Recomendado (activado)
-   - ☐ **Deshabilitar zoom**: Solo si hay problemas con gran angular
-   - ☐ **Modo PNG**: Para códigos difíciles (más lento pero preciso)
+4. **Advanced Options**:
+   - ☑️ **Auto Focus**: Continuously refocus camera (recommended).
+   - ☐ **Disable Zoom**: Keeps focal length at 1.0x.
+   - ☐ **PNG Mode**: Lossless format, slower but handles distorted codes better.
 
-#### Uso en Tiempo Real
-1. Haz clic en **📷 Iniciar Cámara**
-2. Permite el acceso a la cámara cuando el navegador lo solicite
-3. Haz clic en **🔌 Conectar WebSocket**
-4. Apunta la cámara hacia el código de barras
-5. Mantén el código dentro del **recuadro verde**
-6. Espera la confirmación (2 detecciones consecutivas)
-7. El sistema se bloqueará y mostrará el resultado
-8. Haz clic en **🔍 Escanear Otro** para continuar
+#### Real-Time Scanning
+1. Click **📷 Start Camera**.
+2. Grant camera permissions when prompted.
+3. Click **🔌 Connect WebSocket**.
+4. Point your camera at a barcode.
+5. Align the code inside the **green ROI box**.
+6. Wait for verification (requires 2 identical consecutive reads).
+7. The interface will display the confirmed code and pause.
+8. Click **🔍 Scan Another** to resume.
 
-#### Uso con Imágenes Estáticas
-1. Haz clic en **Seleccionar archivo**
-2. Elige una imagen desde tu dispositivo
-3. El resultado aparecerá automáticamente
+#### Static Image Upload
+1. Click **Select file**.
+2. Choose an image containing a barcode.
+3. The results will display automatically.
 
-### Modo 2: API REST
+### Mode 2: REST API
 
 #### Endpoint: POST /api/v1/image/
 
@@ -311,7 +311,7 @@ Navega a `http://localhost:8000/test` o simplemente `http://localhost:8000/`
 ```bash
 curl -X POST "http://localhost:8000/api/v1/image/" \
   -H "Content-Type: multipart/form-data" \
-  -F "file=@codigo_barras.jpg"
+  -F "file=@barcode_image.jpg"
 ```
 
 **Response** (JSON):
@@ -331,7 +331,7 @@ curl -X POST "http://localhost:8000/api/v1/image/" \
 }
 ```
 
-#### Ejemplo Python
+#### Python Example
 ```python
 import requests
 
@@ -341,12 +341,12 @@ response = requests.post(url, files=files)
 data = response.json()
 
 if data["ok"]:
-    print(f"Códigos detectados: {data['barcodes']}")
+    print(f"Detected codes: {data['barcodes']}")
 else:
-    print("No se detectaron códigos")
+    print("No codes detected")
 ```
 
-#### Ejemplo JavaScript
+#### JavaScript Example
 ```javascript
 const formData = new FormData();
 formData.append('file', fileInput.files[0]);
@@ -357,24 +357,24 @@ fetch('http://localhost:8000/api/v1/image/', {
 })
 .then(res => res.json())
 .then(data => {
-  console.log('Códigos:', data.barcodes);
+  console.log('Codes:', data.barcodes);
 })
 .catch(err => console.error(err));
 ```
 
-### Modo 3: WebSocket (Programático)
+### Mode 3: WebSocket (Programmatic)
 
-#### Conexión
+#### Connect
 ```javascript
 const ws = new WebSocket('ws://localhost:8000/api/v1/realtime/');
 
 ws.onopen = () => {
-  console.log('Conectado');
+  console.log('Connected');
 };
 
 ws.onmessage = (event) => {
   const data = JSON.parse(event.data);
-  console.log('Resultado:', data);
+  console.log('Result:', data);
 };
 
 ws.onerror = (error) => {
@@ -382,13 +382,13 @@ ws.onerror = (error) => {
 };
 
 ws.onclose = () => {
-  console.log('Desconectado');
+  console.log('Disconnected');
 };
 ```
 
-#### Enviar Frame
+#### Send Frame
 ```javascript
-// Desde un canvas
+// Convert canvas capture to JPEG blob and send
 canvas.toBlob((blob) => {
   if (ws.readyState === WebSocket.OPEN) {
     ws.send(blob);
@@ -396,7 +396,7 @@ canvas.toBlob((blob) => {
 }, 'image/jpeg', 0.85);
 ```
 
-#### Respuesta del Servidor
+#### Server Response
 ```json
 {
   "type": "result",
@@ -421,14 +421,12 @@ canvas.toBlob((blob) => {
 ### REST Endpoints
 
 #### POST /api/v1/image/
+Processes a static image file and decodes any barcodes found.
 
-Procesa una imagen estática y detecta códigos de barras.
-
-**Request**:
 - **Method**: POST
-- **Content-Type**: multipart/form-data
-- **Body**: 
-  - `file` (binary): Archivo de imagen (JPEG, PNG, etc.)
+- **Content-Type**: `multipart/form-data`
+- **Body**:
+  - `file` (binary): The image file.
 
 **Response** (200 OK):
 ```json
@@ -445,20 +443,8 @@ Procesa una imagen estática y detecta códigos de barras.
 }
 ```
 
-**Campos**:
-- `ok`: `true` si se detectaron códigos, `false` si no
-- `barcodes`: Array de strings con los códigos detectados
-- `locations`: Array de objetos con coordenadas de cada código
-- `sources`: Array con el motor que detectó cada código ("pyzbar", "zxing-cpp", "wechat-qr")
-
-**Códigos de Error**:
-- `400`: Archivo inválido o formato no soportado
-- `413`: Archivo demasiado grande
-- `500`: Error interno del servidor
-
 #### GET /health
-
-Health check endpoint para monitoreo.
+Basic system health check.
 
 **Response** (200 OK):
 ```json
@@ -468,32 +454,21 @@ Health check endpoint para monitoreo.
 ```
 
 #### GET /test
+Serves the HTML5 web interface.
 
-Sirve la interfaz web del cliente HTML5.
-
-**Response**: HTML page
+**Response**: HTML webpage
 
 #### GET /
-
-Redirige a `/test`.
+Redirects to `/test`.
 
 ### WebSocket Endpoint
 
 #### WS /api/v1/realtime/
+Accepts binary video frames for real-time decoding.
 
-Conexión WebSocket para detección en tiempo real.
+- **Client Message**: Binary (JPEG/PNG blob).
+- **Server Message**: JSON text format.
 
-**Protocolo**:
-1. Cliente se conecta
-2. Cliente envía frames como binary (Blob/ArrayBuffer)
-3. Servidor procesa y responde con JSON
-4. Cliente recibe resultados y envía siguiente frame
-
-**Mensaje del Cliente**:
-- **Tipo**: Binary (image/jpeg o image/png)
-- **Contenido**: Frame capturado de la cámara
-
-**Mensaje del Servidor**:
 ```json
 {
   "type": "result" | "ack" | "error",
@@ -501,916 +476,117 @@ Conexión WebSocket para detección en tiempo real.
   "barcodes": string[],
   "locations": object[],
   "sources": string[],
-  "error": string  // Solo si type="error"
-}
-```
-
-**Tipos de Mensaje**:
-- `result`: Resultado del procesamiento
-- `ack`: Confirmación (mensajes de texto)
-- `error`: Error durante el procesamiento
-
-**Manejo de Errores**:
-- El servidor NO cierra la conexión ante errores de procesamiento
-- Envía mensaje tipo `error` y continúa esperando frames
-- Cliente debe manejar reconexión si la conexión se pierde
-
----
-
-## 🎨 Cliente Web (Frontend)
-
-### Estructura HTML
-
-#### Controles Principales
-```html
-<button id="startBtn">📷 Iniciar Cámara</button>
-<button id="stopBtn">⏹️ Detener</button>
-<button id="connectBtn">🔌 Conectar WebSocket</button>
-<button id="disconnectBtn">❌ Desconectar</button>
-```
-
-#### Configuración
-```html
-<select id="resolution">
-  <option value="960x720">960x720</option>
-  <option value="1280x720">1280x720</option>
-  <option value="1920x1080">1920x1080</option>
-</select>
-
-<input id="jpegQuality" type="range" min="0.5" max="0.95" step="0.05">
-<input id="frameInterval" type="number" min="600" max="3000">
-
-<input type="checkbox" id="autoFocusMode" checked>
-<input type="checkbox" id="disableZoom">
-<input type="checkbox" id="pngMode">
-```
-
-### JavaScript: Funciones Principales
-
-#### startCamera()
-Inicia la captura de video desde la cámara.
-
-```javascript
-async function startCamera() {
-  // 1. Selecciona la mejor cámara trasera
-  // 2. Configura resolución y constraints
-  // 3. Aplica zoom y enfoque automático
-  // 4. Muestra el stream en <video>
-}
-```
-
-**Características**:
-- Detecta automáticamente la cámara trasera
-- Evita seleccionar cámara frontal (selfie)
-- Configura zoom óptimo (preferencia: 1.0x)
-- Habilita enfoque continuo si está disponible
-
-#### connectWebSocket()
-Establece conexión WebSocket con el servidor.
-
-```javascript
-function connectWebSocket() {
-  ws = new WebSocket(WS_URL);
-  
-  ws.onopen = () => {
-    startSendingFrames();
-  };
-  
-  ws.onmessage = (event) => {
-    displayResults(JSON.parse(event.data));
-  };
-}
-```
-
-#### startSendingFrames()
-Bucle principal de captura y envío.
-
-```javascript
-function startSendingFrames() {
-  // 1. Captura frame del video
-  // 2. Extrae ROI (región de interés)
-  // 3. Convierte a JPEG/PNG
-  // 4. Envía por WebSocket
-  // 5. Espera intervalo configurado
-  // 6. Repite si no está bloqueado
-}
-```
-
-**Optimizaciones**:
-- Frame skipping: Procesa 1 de cada 10 frames
-- Backpressure control: Detiene envío si el buffer WS > 512KB
-- ROI limitado: Máximo 640x360px para reducir bytes
-- Canvas reutilizable: No recrea canvas en cada frame
-
-#### displayResults()
-Muestra los resultados en la UI.
-
-```javascript
-function displayResults(data) {
-  // 1. Verifica estado de bloqueo
-  // 2. Incrementa contador de confianza
-  // 3. Si confianza >= 2, bloquea detección
-  // 4. Muestra resultado confirmado
-  // 5. Pausa envío de frames
-}
-```
-
-**Sistema de Confianza**:
-- Requiere 2 detecciones consecutivas del mismo código
-- Fuentes confiables (PyZbar, WeChat QR) bloquean inmediatamente
-- Resetea contador si detecta código diferente
-
-#### getDisplayedVideoRect()
-Calcula las dimensiones reales del video renderizado.
-
-```javascript
-function getDisplayedVideoRect() {
-  // Maneja letterboxing y aspect ratio
-  // Retorna: { x, y, width, height, vw, vh }
-}
-```
-
-**Propósito**: Alinear el overlay verde exactamente con el contenido del video.
-
-#### positionOverlay()
-Posiciona el recuadro verde sobre el video.
-
-```javascript
-function positionOverlay() {
-  const rect = getDisplayedVideoRect();
-  // ROI: 80% ancho, 30% alto, centrado
-  overlay.style.left = `${roiX}px`;
-  overlay.style.top = `${roiY}px`;
-  overlay.style.width = `${roiW}px`;
-  overlay.style.height = `${roiH}px`;
-}
-```
-
-### CSS: Clases Principales
-
-```css
-.video-container {
-  position: relative;
-  display: inline-block;
-  border: 2px solid #333;
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.scan-overlay {
-  position: absolute;
-  border: 2px solid #4CAF50;
-  background: rgba(76, 175, 80, 0.1);
-  pointer-events: none;
-  border-radius: 10px;
-  box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
-}
-
-.confirmed-result {
-  background: #d4edda !important;
-  border: 2px solid #28a745 !important;
-  font-weight: bold;
+  "error": string  // Populated only if type="error"
 }
 ```
 
 ---
 
-## ⚡ Optimización y Rendimiento
+## 🎨 Web Client (Frontend)
 
-### Backend
+The frontend captures camera input using the browser's MediaDevices API and pipelines frames through WebSocket binary messages.
 
-#### 1. Procesamiento de Imágenes
+### Main JavaScript Functions
 
-**Reducir tamaño antes de procesar**:
-```python
-# En utils/image.py
-max_dimension = 1280
-if max(width, height) > max_dimension:
-    scale = max_dimension / max(width, height)
-    image = cv2.resize(image, None, fx=scale, fy=scale)
-```
-
-**Beneficio**: Reduce carga de CPU sin afectar detección.
-
-#### 2. WebSocket Buffering
-
-**Control de backpressure**:
-```javascript
-if (ws.bufferedAmount > 512 * 1024) {
-  console.log('WS congestionado, saltando frame');
-  return;
-}
-```
-
-**Beneficio**: Evita acumulación de frames pendientes.
-
-#### 3. Paralelización
-
-**Futuras mejoras**:
-```python
-# Procesar frames en pool de workers
-from concurrent.futures import ProcessPoolExecutor
-
-executor = ProcessPoolExecutor(max_workers=4)
-result = await loop.run_in_executor(executor, process_image, frame)
-```
-
-### Frontend
-
-#### 1. Frame Rate Adaptativo
-
-**Ajustar intervalo según latencia**:
-```javascript
-let avgLatency = 0;
-const sendTime = Date.now();
-
-ws.onmessage = (event) => {
-  const latency = Date.now() - sendTime;
-  avgLatency = avgLatency * 0.8 + latency * 0.2;
-  
-  // Aumentar intervalo si latencia alta
-  if (avgLatency > 1000) {
-    frameInterval = Math.min(3000, frameInterval + 200);
-  }
-};
-```
-
-#### 2. Canvas Pooling
-
-**Reutilizar canvas en lugar de crear nuevos**:
-```javascript
-if (!roiCanvas) {
-  roiCanvas = document.createElement('canvas');
-}
-// Reutilizar en cada frame
-```
-
-**Beneficio**: Reduce garbage collection.
-
-#### 3. ROI Inteligente
-
-**Limitar resolución del ROI**:
-```javascript
-const MAX_ROI_W = 640;
-const MAX_ROI_H = 360;
-const scaleDown = Math.min(1, MAX_ROI_W / sw, MAX_ROI_H / sh);
-```
-
-**Beneficio**: Envía menos bytes manteniendo calidad.
-
-### Recomendaciones por Escenario
-
-#### Alta Latencia (3G, rural)
-- ✅ Intervalo: 2000ms
-- ✅ Calidad JPEG: 0.70
-- ✅ Resolución: 960x720
-- ✅ Modo PNG: Desactivado
-
-#### Baja Latencia (WiFi, fibra)
-- ✅ Intervalo: 800ms
-- ✅ Calidad JPEG: 0.90
-- ✅ Resolución: 1280x720
-- ✅ Modo PNG: Opcional para códigos difíciles
-
-#### Códigos Pequeños o Difíciles
-- ✅ Intervalo: 1500ms
-- ✅ Calidad JPEG: 0.95
-- ✅ Resolución: 1920x1080
-- ✅ Modo PNG: Activado
+- **`startCamera()`**: Detects and initiates the optimal back camera.
+- **`connectWebSocket()`**: Manages WebSocket lifecycle, error handling, and reconnection.
+- **`startSendingFrames()`**: Captures frames from the `<video>` element, crops the Region of Interest (ROI), converts the image to JPEG/PNG, and pushes the binary payload.
+- **`displayResults()`**: Tracks confidence levels across frames. Employs a debounce lock requiring 2 consecutive reads of the same barcode before confirming the detection.
 
 ---
 
-## 🛠️ Solución de Problemas
+## ⚡ Optimization and Performance
 
-### Problemas Comunes
+### Backend Optimizations
 
-#### 1. "No se puede acceder a la cámara"
+1. **Downscaling**: Large images are downscaled to a max dimension of 1280px in `utils/image.py` prior to detection, saving significant CPU cycles.
+2. **WebSocket Buffering**: Client backpressure checks (`ws.bufferedAmount`) drop frames if the socket buffer exceeds 512KB to avoid latency pileups.
 
-**Síntomas**:
-- Error: `NotAllowedError` o `NotFoundError`
-- La cámara no se activa
+### Recommended Configurations by Scenario
 
-**Soluciones**:
-- ✅ Verifica permisos del navegador (ícono de cámara en barra de direcciones)
-- ✅ Asegúrate de usar HTTPS en producción (localhost funciona con HTTP)
-- ✅ Prueba en otro navegador (Chrome recomendado)
-- ✅ Verifica que el dispositivo tenga cámara
-- ✅ Cierra otras aplicaciones que usen la cámara
+#### High Latency / Cellular Connection
+- **Resolution**: 960x720
+- **Quality**: 0.70 JPEG
+- **Interval**: 2000 ms
+- **PNG Mode**: Disabled
 
-**Workaround**: Usa la opción de subir archivo en lugar de streaming.
+#### Low Latency / Wi-Fi
+- **Resolution**: 1280x720
+- **Quality**: 0.85-0.90 JPEG
+- **Interval**: 1000 ms
+- **PNG Mode**: Optional
 
-#### 2. "Cámara frontal en lugar de trasera"
-
-**Síntomas**:
-- Se activa la cámara de selfie
-- Error: `FrontCameraSelectedAfterFiltering`
-
-**Soluciones**:
-- ✅ Concede permisos de cámara al sitio
-- ✅ Verifica que el dispositivo tenga cámara trasera
-- ✅ Prueba en Chrome/Firefox actualizados
-- ✅ Limpia caché y recarga la página
-
-**Nota**: La app nunca usará la cámara frontal por razones de seguridad.
-
-#### 3. "WebSocket desconecta constantemente"
-
-**Síntomas**:
-- Mensajes de desconexión frecuentes
-- No se procesan frames
-
-**Soluciones**:
-- ✅ Verifica que el servidor esté corriendo
-- ✅ Asegúrate de que ambos dispositivos estén en la misma red
-- ✅ Revisa firewalls que bloqueen WebSockets
-- ✅ Aumenta el intervalo entre frames (reduce carga)
-- ✅ Verifica logs del servidor para errores
-
-#### 4. "No se detectan códigos"
-
-**Síntomas**:
-- La cámara funciona pero no detecta códigos
-- Siempre muestra "Escaneando..."
-
-**Soluciones**:
-- ✅ Asegúrate de que el código esté dentro del **recuadro verde**
-- ✅ Mejora la iluminación (evita reflejos)
-- ✅ Mantén la cámara estable durante 1-2 segundos
-- ✅ Aumenta la calidad JPEG a 0.90-0.95
-- ✅ Prueba con resolución más alta (1920x1080)
-- ✅ Activa **Modo PNG sin pérdida** para códigos difíciles
-- ✅ Limpia la lente de la cámara
-- ✅ Ajusta distancia al código (ni muy cerca ni muy lejos)
-
-#### 5. "Error al procesar imagen: No module named 'PIL'"
-
-**Síntomas**:
-- Error en logs del servidor
-- Fallo al procesar imágenes
-
-**Solución**:
-```bash
-# Asegúrate de tener Pillow instalado
-uv sync
-
-# O manualmente
-pip install pillow>=12.0.0
-```
-
-#### 6. "TypeError: 'NoneType' object is not subscriptable"
-
-**Síntomas**:
-- Error en el backend al procesar imágenes
-- Generalmente en `utils/barcode.py`
-
-**Causa**: Imagen corrupta o formato no soportado.
-
-**Solución**:
-- ✅ Verifica que la imagen sea válida (JPEG/PNG)
-- ✅ Prueba con otra imagen
-- ✅ Revisa los logs del servidor para más detalles
-
-#### 7. "High CPU usage"
-
-**Síntomas**:
-- Servidor consume mucha CPU
-- Lentitud general
-
-**Soluciones**:
-- ✅ Reduce la resolución de captura
-- ✅ Aumenta el intervalo entre frames
-- ✅ Limita el número de conexiones WebSocket simultáneas
-- ✅ Considera usar un servidor más potente
-- ✅ Implementa rate limiting
-
-### Debugging
-
-#### Habilitar Logs Detallados
-
-**Backend**:
-```python
-import logging
-logging.basicConfig(level=logging.DEBUG)
-```
-
-**Frontend**:
-```javascript
-// Los logs ya están habilitados en console.log
-// Abre DevTools (F12) → Console
-```
-
-#### Verificar Conectividad
-
-```bash
-# Prueba el endpoint de salud
-curl http://localhost:8000/health
-
-# Prueba la API REST
-curl -X POST http://localhost:8000/api/v1/image/ \
-  -F "file=@test_image.jpg"
-```
-
-#### Inspeccionar WebSocket
-
-1. Abre DevTools (F12)
-2. Ve a la pestaña **Network**
-3. Filtra por **WS** (WebSocket)
-4. Haz clic en la conexión WebSocket
-5. Ve a la pestaña **Messages** para ver el tráfico
+#### Small or Difficult Barcodes
+- **Resolution**: 1920x1080
+- **Quality**: 0.95 JPEG
+- **Interval**: 1500 ms
+- **PNG Mode**: Enabled
 
 ---
 
-## 👨‍💻 Desarrollo y Contribución
+## 🛠️ Troubleshooting
 
-### Estructura del Proyecto
+### Common Problems
 
+#### 1. "Camera cannot be accessed"
+- **Symptoms**: `NotAllowedError` or camera remains inactive.
+- **Fixes**: Check browser permissions, ensure the site runs on HTTPS (required by browsers for camera APIs outside localhost), and shut down other applications using the camera.
+
+#### 2. "WebSocket disconnects frequently"
+- **Symptoms**: Scanner halts; console reports connection loss.
+- **Fixes**: Verify the backend server is active, ensure client and server are on the same local network, and check firewalls. If bandwidth is choked, increase the frame interval (e.g. to 1500ms).
+
+#### 3. "No codes are detected"
+- **Fixes**: Move the barcode into the highlighted green box (ROI), improve lighting, steady the device for 1-2 seconds, or switch to Lossless PNG Mode if the code has poor contrast.
+
+---
+
+## 👨‍💻 Development and Contribution
+
+### Project Structure
 ```
 barcode-python-main/
 ├── src/
 │   └── omnilector/
 │       ├── __init__.py              # Entry points
-│       ├── main.py                  # FastAPI app principal
-│       ├── models/                  # Modelos Pydantic
-│       │   ├── __init__.py
-│       │   └── responses/
-│       │       ├── barcode.py       # BarcodeResponse
-│       │       └── websocket.py     # WebSocket messages
-│       ├── routes/                  # API routes
-│       │   ├── __init__.py
-│       │   └── v1/
-│       │       ├── image.py         # POST /api/v1/image/
-│       │       └── realtime.py      # WS /api/v1/realtime/
-│       └── utils/                   # Utilidades
-│           ├── barcode.py           # Detectores
-│           ├── image.py             # Procesamiento
-│           └── websocket.py         # Helpers WS
-├── websocket_test.html              # Cliente web
-├── pyproject.toml                   # Dependencias y config
-├── Dockerfile                       # Imagen Docker
-├── docker-compose.yml               # Compose config
-├── README.md                        # Documentación básica
-└── DOCUMENTATION.md                 # Esta documentación
-
+│       ├── main.py                  # Main FastAPI Application
+│       ├── models/                  # Pydantic Schemas
+│       ├── routes/                  # API Routers (v1)
+│       └── utils/                   # Detection & image helpers
+├── websocket_test.html              # HTML5 Web client
+├── pyproject.toml                   # Project metadata & deps
+├── Dockerfile                       # Container definition
+├── docker-compose.yml               # Service composition
+├── README.md                        # Primary documentation
+└── DOCUMENTATION.md                 # This file
 ```
 
-### Configurar Entorno de Desarrollo
-
+### Setup Development Environment
 ```bash
-# 1. Clonar repo
 git clone https://github.com/Futurion-partners/Omnilector.git
 cd Omnilector
-
-# 2. Instalar uv
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# 3. Instalar dependencias
 uv sync
-
-# 4. Activar entorno virtual (opcional)
-source .venv/bin/activate  # Linux/macOS
-.venv\Scripts\activate     # Windows
-
-# 5. Ejecutar en modo desarrollo
 uv run omnilector-dev
 ```
 
-### Agregar Nuevos Detectores
-
-**Ejemplo**: Agregar un nuevo motor de detección.
-
-1. **Crear función en `utils/barcode.py`**:
-```python
-def detect_with_new_engine(image: np.ndarray) -> list:
-    """Detecta códigos con nuevo motor."""
-    # Tu implementación aquí
-    return detected_codes
-```
-
-2. **Integrar en `utils/image.py`**:
-```python
-async def process_image(image_bytes: bytes) -> BarcodeResponse:
-    # ... código existente ...
-    
-    # Agregar nueva detección
-    new_codes = detect_with_new_engine(image)
-    all_barcodes.extend(new_codes)
-    
-    # ...
-```
-
-3. **Agregar fuente al response**:
-```python
-sources.extend(['new-engine'] * len(new_codes))
-```
-
-### Testing
-
-#### Tests Unitarios
-
+### Running Tests
 ```bash
-# Ejecutar tests
+# Run all unit tests
 pytest
 
-# Con cobertura
+# Check coverage
 pytest --cov=src/omnilector
 ```
 
-#### Tests de Integración
-
-**Test API REST**:
-```python
-from fastapi.testclient import TestClient
-from omnilector.main import app
-
-client = TestClient(app)
-
-def test_image_endpoint():
-    with open("test_barcode.jpg", "rb") as f:
-        response = client.post(
-            "/api/v1/image/",
-            files={"file": ("test.jpg", f, "image/jpeg")}
-        )
-    assert response.status_code == 200
-    data = response.json()
-    assert data["ok"] == True
-    assert len(data["barcodes"]) > 0
-```
-
-**Test WebSocket**:
-```python
-def test_websocket():
-    with client.websocket_connect("/api/v1/realtime/") as ws:
-        # Enviar frame
-        with open("test_frame.jpg", "rb") as f:
-            ws.send_bytes(f.read())
-        
-        # Recibir respuesta
-        data = ws.receive_json()
-        assert data["type"] == "result"
-```
-
-### Convenciones de Código
-
-#### Python (Backend)
-- Seguir [PEP 8](https://pep8.org/)
-- Usar type hints
-- Docstrings en formato Google
-- Líneas máximo 100 caracteres
-
-**Ejemplo**:
-```python
-async def process_image(image_bytes: bytes) -> BarcodeResponse:
-    """Procesa una imagen y detecta códigos de barras.
-    
-    Args:
-        image_bytes: Bytes de la imagen en formato JPEG/PNG.
-    
-    Returns:
-        BarcodeResponse con códigos detectados y ubicaciones.
-    
-    Raises:
-        ValueError: Si la imagen es inválida.
-    """
-    # Implementación...
-```
-
-#### JavaScript (Frontend)
-- Usar `camelCase` para variables y funciones
-- Usar `const` por defecto, `let` si es necesario
-- Comentarios JSDoc para funciones principales
-
-**Ejemplo**:
-```javascript
-/**
- * Inicia la captura de video desde la cámara.
- * @returns {Promise<void>}
- */
-async function startCamera() {
-  // Implementación...
-}
-```
-
-### Pull Requests
-
-1. **Fork** el repositorio
-2. **Crea una rama** para tu feature: `git checkout -b feature/nueva-funcionalidad`
-3. **Haz commits** descriptivos: `git commit -m "feat: agregar detección de Aztec Code"`
-4. **Push** a tu fork: `git push origin feature/nueva-funcionalidad`
-5. **Abre un PR** en GitHub con descripción detallada
-
-**Template de PR**:
-```markdown
-## Descripción
-Breve descripción de los cambios.
-
-## Tipo de cambio
-- [ ] Bug fix
-- [ ] Nueva funcionalidad
-- [ ] Breaking change
-- [ ] Documentación
-
-## Checklist
-- [ ] He probado los cambios localmente
-- [ ] He actualizado la documentación
-- [ ] He agregado tests
-- [ ] Los tests pasan
-```
-
 ---
 
-## 🚀 Despliegue en Producción
+## 🚀 Production Deployment
 
-### Consideraciones de Seguridad
+### Security Checklist
+1. **Enforce HTTPS**: Reverse proxy with Nginx to manage SSL certificates.
+2. **CORS Configuration**: Restrict the wildcard `allow_origins=["*"]` to your trusted production domains.
+3. **File Validation**: Validate size limits (e.g., max 10MB) and content types (JPEG/PNG/WebP) on image upload endpoints.
 
-#### 1. HTTPS Obligatorio
-```nginx
-# Nginx config
-server {
-    listen 80;
-    server_name barcode.example.com;
-    return 301 https://$server_name$request_uri;
-}
-
-server {
-    listen 443 ssl;
-    server_name barcode.example.com;
-    
-    ssl_certificate /path/to/cert.pem;
-    ssl_certificate_key /path/to/key.pem;
-    
-    location / {
-        proxy_pass http://localhost:8000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-    
-    location /api/v1/realtime/ {
-        proxy_pass http://localhost:8000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-    }
-}
-```
-
-#### 2. Rate Limiting
-```python
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
-
-limiter = Limiter(key_func=get_remote_address)
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-
-@router.post("/image/")
-@limiter.limit("10/minute")
-async def detect_barcode(request: Request, file: UploadFile):
-    # ...
-```
-
-#### 3. Validación de Archivos
-```python
-MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
-ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"]
-
-async def validate_upload(file: UploadFile):
-    # Verificar tipo
-    if file.content_type not in ALLOWED_TYPES:
-        raise HTTPException(400, "Tipo de archivo no permitido")
-    
-    # Verificar tamaño
-    contents = await file.read()
-    if len(contents) > MAX_FILE_SIZE:
-        raise HTTPException(413, "Archivo demasiado grande")
-    
-    await file.seek(0)
-    return contents
-```
-
-### Variables de Entorno
-
-```env
-# .env file
-PORT=8000
-HOST=0.0.0.0
-LOG_LEVEL=info
-BARCODE_ONLY_PYZBAR=0
-MAX_FILE_SIZE=10485760
-ALLOWED_ORIGINS=https://example.com,https://app.example.com
-```
-
-**Cargar en la app**:
-```python
-from pydantic_settings import BaseSettings
-
-class Settings(BaseSettings):
-    port: int = 8000
-    host: str = "0.0.0.0"
-    log_level: str = "info"
-    
-    class Config:
-        env_file = ".env"
-
-settings = Settings()
-```
-
-### Docker en Producción
-
-**docker-compose.yml**:
-```yaml
-version: '3.8'
-
-services:
-  barcode-api:
-    image: omnilector:latest
-    container_name: barcode-api
-    restart: unless-stopped
-    ports:
-      - "8000:8000"
-    environment:
-      - PORT=8000
-      - LOG_LEVEL=warning
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 3s
-      retries: 3
-    deploy:
-      resources:
-        limits:
-          cpus: '2'
-          memory: 1G
-```
-
-### Kubernetes
-
-**deployment.yaml**:
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: barcode-api
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: barcode-api
-  template:
-    metadata:
-      labels:
-        app: barcode-api
-    spec:
-      containers:
-      - name: barcode-api
-        image: omnilector:latest
-        ports:
-        - containerPort: 8000
-        env:
-        - name: PORT
-          value: "8000"
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "500m"
-          limits:
-            memory: "1Gi"
-            cpu: "1000m"
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 8000
-          initialDelaySeconds: 10
-          periodSeconds: 30
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 8000
-          initialDelaySeconds: 5
-          periodSeconds: 10
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: barcode-api-service
-spec:
-  selector:
-    app: barcode-api
-  ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 8000
-  type: LoadBalancer
-```
-
-### Monitoreo
-
-#### Prometheus Metrics
-```python
-from prometheus_client import Counter, Histogram
-from prometheus_fastapi_instrumentator import Instrumentator
-
-# Métricas
-detections_total = Counter('barcode_detections_total', 'Total detections')
-processing_time = Histogram('barcode_processing_seconds', 'Processing time')
-
-# Instrumentar app
-Instrumentator().instrument(app).expose(app)
-```
-
-#### Logs Estructurados
-```python
-import logging
-import json
-
-class JSONFormatter(logging.Formatter):
-    def format(self, record):
-        return json.dumps({
-            "timestamp": self.formatTime(record),
-            "level": record.levelname,
-            "message": record.getMessage(),
-            "module": record.module
-        })
-
-handler = logging.StreamHandler()
-handler.setFormatter(JSONFormatter())
-logging.getLogger().addHandler(handler)
-```
-
-### Backup y Disaster Recovery
-
-```bash
-# Backup de la imagen Docker
-docker save omnilector:latest | gzip > barcode-backup.tar.gz
-
-# Restaurar
-gunzip -c barcode-backup.tar.gz | docker load
-
-# Backup de configuración
-tar -czf config-backup.tar.gz docker-compose.yml .env nginx.conf
-```
-
----
-
-## 📊 Rendimiento y Métricas
-
-### Benchmarks
-
-**Hardware de prueba**:
-- CPU: Intel i5-10400 (6 cores)
-- RAM: 16 GB DDR4
-- Red: 1 Gbps Ethernet
-
-**Resultados**:
-- **API REST**: ~50-80 ms por imagen (640x480)
-- **WebSocket**: ~100-150 ms latencia total (captura + procesamiento)
-- **Throughput**: ~10-15 detecciones/segundo por conexión
-- **Capacidad**: ~50 conexiones WebSocket simultáneas
-
-### Métricas de Precisión
-
-**Tasa de detección exitosa**:
-- Códigos QR: **98%**
-- EAN-13: **95%**
-- Code 128: **92%**
-- Aztec: **85%**
-
-**Falsos positivos**: < 1%
-
----
-
-## 📄 Licencia
-
-Este proyecto está bajo la licencia [MIT](LICENSE).
-
----
-
-## 🤝 Soporte
-
-### Contacto
-- **Email**: support@futurion.com
-- **GitHub Issues**: [github.com/Futurion-partners/Omnilector/issues](https://github.com/Futurion-partners/Omnilector/issues)
-
-### Recursos
-- [Documentación FastAPI](https://fastapi.tiangolo.com/)
-- [OpenCV Documentation](https://docs.opencv.org/)
-- [PyZbar GitHub](https://github.com/NaturalHistoryMuseum/pyzbar)
-- [ZXing-C++ GitHub](https://github.com/zxing-cpp/zxing-cpp)
-
----
-
-## 📝 Changelog
-
-### v1.0.0 (2024-01-15)
-- 🎉 Release inicial
-- ✅ API REST para imágenes estáticas
-- ✅ WebSocket para tiempo real
-- ✅ Cliente web HTML5
-- ✅ Soporte multi-motor (PyZbar, ZXing, OpenCV)
-- ✅ Sistema de confianza para detecciones
-- ✅ Docker y Docker Compose
-
----
-
-**Última actualización**: Octubre 6, 2025  
-**Versión**: 1.0.0  
-**Autor**: Futurion Partners (@Futurion-partners)
+**Last update**: October 6, 2025  
+**Version**: 1.0.0  
+**Author**: Futurion Partners (@Futurion-partners)

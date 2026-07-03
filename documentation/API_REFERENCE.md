@@ -1,11 +1,11 @@
 # 📡 API Reference - Omnilector
 
-## Información General
+## General Information
 
 **Base URL**: `http://localhost:8000`  
-**Versión**: v1  
-**Formato**: JSON  
-**Autenticación**: No requerida (en esta versión)
+**Version**: v1  
+**Format**: JSON  
+**Authentication**: Not required (in this version)
 
 ---
 
@@ -17,7 +17,7 @@
 GET /health
 ```
 
-Verifica el estado del servidor.
+Verifies the server status.
 
 #### Response (200 OK)
 
@@ -27,13 +27,13 @@ Verifica el estado del servidor.
 }
 ```
 
-#### Ejemplo con curl
+#### Example using curl
 
 ```bash
 curl http://localhost:8000/health
 ```
 
-#### Ejemplo con Python
+#### Example using Python
 
 ```python
 import requests
@@ -44,22 +44,22 @@ print(response.json())  # {"status": "ok"}
 
 ---
 
-### 2. Procesar Imagen Estática
+### 2. Process Static Image
 
 ```http
 POST /api/v1/image/
 ```
 
-Envía una imagen y recibe los códigos de barras detectados.
+Upload an image and receive detected barcodes.
 
 #### Request
 
 **Content-Type**: `multipart/form-data`
 
 **Parameters**:
-| Campo | Tipo | Requerido | Descripción |
+| Field | Type | Required | Description |
 |-------|------|-----------|-------------|
-| file  | binary | Sí | Archivo de imagen (JPEG, PNG, WebP, etc.) |
+| file  | binary | Yes | Image file (JPEG, PNG, WebP, etc.) |
 
 #### Response (200 OK)
 
@@ -77,18 +77,18 @@ Envía una imagen y recibe los códigos de barras detectados.
 }
 ```
 
-**Campos**:
-- `ok`: `true` si se detectaron códigos, `false` si no
-- `barcodes`: Array de strings con los códigos detectados
-- `locations`: Array de objetos con las coordenadas de cada código
-  - `x`: Coordenada X del borde superior izquierdo
-  - `y`: Coordenada Y del borde superior izquierdo
-  - `width`: Ancho del código en píxeles
-  - `height`: Alto del código en píxeles
-- `sources`: Array con el motor que detectó cada código
-  - Valores posibles: `"pyzbar"`, `"zxing-cpp"`, `"wechat-qr"`
+**Fields**:
+- `ok`: `true` if codes were detected, `false` otherwise
+- `barcodes`: Array of strings containing detected codes
+- `locations`: Array of objects with bounding box coordinates for each code
+  - `x`: X-coordinate of top-left corner
+  - `y`: Y-coordinate of top-left corner
+  - `width`: Code width in pixels
+  - `height`: Code height in pixels
+- `sources`: Array with the detection engine that recognized each code
+  - Possible values: `"pyzbar"`, `"zxing-cpp"`, `"wechat-qr"`
 
-#### Ejemplo de Respuesta Exitosa
+#### Example Successful Response
 
 ```json
 {
@@ -106,7 +106,7 @@ Envía una imagen y recibe los códigos de barras detectados.
 }
 ```
 
-#### Ejemplo de Respuesta sin Detección
+#### Example No-Detection Response
 
 ```json
 {
@@ -122,14 +122,14 @@ Envía una imagen y recibe los códigos de barras detectados.
 **400 Bad Request**
 ```json
 {
-  "detail": "Archivo inválido o formato no soportado"
+  "detail": "Invalid file or unsupported format"
 }
 ```
 
 **413 Payload Too Large**
 ```json
 {
-  "detail": "Archivo demasiado grande"
+  "detail": "File too large"
 }
 ```
 
@@ -149,11 +149,11 @@ Envía una imagen y recibe los códigos de barras detectados.
 **500 Internal Server Error**
 ```json
 {
-  "detail": "Error interno del servidor"
+  "detail": "Internal server error"
 }
 ```
 
-#### Ejemplo con curl
+#### Example using curl
 
 ```bash
 curl -X POST "http://localhost:8000/api/v1/image/" \
@@ -161,7 +161,7 @@ curl -X POST "http://localhost:8000/api/v1/image/" \
   -F "file=@barcode.jpg"
 ```
 
-#### Ejemplo con Python (requests)
+#### Example using Python (requests)
 
 ```python
 import requests
@@ -173,13 +173,13 @@ response = requests.post(url, files=files)
 data = response.json()
 
 if data["ok"]:
-    print(f"Códigos detectados: {data['barcodes']}")
-    print(f"Detectado con: {data['sources']}")
+    print(f"Detected codes: {data['barcodes']}")
+    print(f"Detected by: {data['sources']}")
 else:
-    print("No se detectaron códigos")
+    print("No codes detected")
 ```
 
-#### Ejemplo con Python (httpx + asyncio)
+#### Example using Python (httpx + asyncio)
 
 ```python
 import httpx
@@ -198,7 +198,7 @@ result = asyncio.run(detect_barcode())
 print(result)
 ```
 
-#### Ejemplo con JavaScript (fetch)
+#### Example using JavaScript (fetch)
 
 ```javascript
 const formData = new FormData();
@@ -211,16 +211,16 @@ fetch('http://localhost:8000/api/v1/image/', {
 .then(response => response.json())
 .then(data => {
   if (data.ok) {
-    console.log('Códigos:', data.barcodes);
-    console.log('Ubicaciones:', data.locations);
+    console.log('Codes:', data.barcodes);
+    console.log('Locations:', data.locations);
   } else {
-    console.log('No se detectaron códigos');
+    console.log('No codes detected');
   }
 })
 .catch(error => console.error('Error:', error));
 ```
 
-#### Ejemplo con JavaScript (axios)
+#### Example using JavaScript (axios)
 
 ```javascript
 const axios = require('axios');
@@ -234,7 +234,7 @@ axios.post('http://localhost:8000/api/v1/image/', form, {
   headers: form.getHeaders()
 })
 .then(response => {
-  console.log('Resultado:', response.data);
+  console.log('Result:', response.data);
 })
 .catch(error => {
   console.error('Error:', error.message);
@@ -243,36 +243,36 @@ axios.post('http://localhost:8000/api/v1/image/', form, {
 
 ---
 
-### 3. WebSocket en Tiempo Real
+### 3. Real-Time WebSocket
 
 ```
 WS /api/v1/realtime/
 ```
 
-Establece una conexión WebSocket para detección en tiempo real.
+Establishes a WebSocket connection for real-time streaming detection.
 
-#### Protocolo de Comunicación
+#### Communication Protocol
 
-**1. Cliente se conecta**
+**1. Client Connects**
 ```javascript
 const ws = new WebSocket('ws://localhost:8000/api/v1/realtime/');
 ```
 
-**2. Servidor acepta conexión**
-- Estado: `WebSocket.OPEN` (readyState = 1)
+**2. Server Accepts Connection**
+- State: `WebSocket.OPEN` (readyState = 1)
 
-**3. Cliente envía frames**
-- Tipo: **Binary** (Blob o ArrayBuffer)
-- Formato: JPEG o PNG
-- Frecuencia recomendada: 1 frame cada 800-1500ms
+**3. Client Sends Frames**
+- Type: **Binary** (Blob or ArrayBuffer)
+- Format: JPEG or PNG
+- Recommended rate: 1 frame every 800-1500ms
 
-**4. Servidor procesa y responde**
-- Tipo: **Text** (JSON string)
-- Formato: Ver estructura de mensajes abajo
+**4. Server Processes and Responds**
+- Type: **Text** (JSON string)
+- Format: See message structures below
 
-#### Tipos de Mensajes del Servidor
+#### Server Message Types
 
-##### A. Resultado de Detección
+##### A. Detection Result
 
 ```json
 {
@@ -289,7 +289,7 @@ const ws = new WebSocket('ws://localhost:8000/api/v1/realtime/');
 }
 ```
 
-**Ejemplo con detección**:
+**Example with detection**:
 ```json
 {
   "type": "result",
@@ -307,7 +307,7 @@ const ws = new WebSocket('ws://localhost:8000/api/v1/realtime/');
 }
 ```
 
-**Ejemplo sin detección**:
+**Example without detection**:
 ```json
 {
   "type": "result",
@@ -320,7 +320,7 @@ const ws = new WebSocket('ws://localhost:8000/api/v1/realtime/');
 
 ##### B. Acknowledgement (ACK)
 
-Respuesta a mensajes de texto del cliente.
+Response to text messages sent by the client.
 
 ```json
 {
@@ -334,11 +334,11 @@ Respuesta a mensajes de texto del cliente.
 ```json
 {
   "type": "error",
-  "error": "Descripción del error"
+  "error": "Error description"
 }
 ```
 
-**Ejemplo**:
+**Example**:
 ```json
 {
   "type": "error",
@@ -346,34 +346,34 @@ Respuesta a mensajes de texto del cliente.
 }
 ```
 
-#### Ejemplo Completo con JavaScript
+#### Complete JavaScript Example
 
 ```javascript
 const ws = new WebSocket('ws://localhost:8000/api/v1/realtime/');
 
-// Conexión establecida
+// Connection established
 ws.onopen = () => {
-  console.log('✅ WebSocket conectado');
+  console.log('✅ WebSocket connected');
   startSendingFrames();
 };
 
-// Mensaje recibido del servidor
+// Message received from server
 ws.onmessage = (event) => {
   const data = JSON.parse(event.data);
   
   switch(data.type) {
     case 'result':
       if (data.ok) {
-        console.log('Códigos detectados:', data.barcodes);
-        console.log('Ubicaciones:', data.locations);
-        console.log('Detectado con:', data.sources);
+        console.log('Detected codes:', data.barcodes);
+        console.log('Locations:', data.locations);
+        console.log('Detected by:', data.sources);
       } else {
-        console.log('Sin detecciones en este frame');
+        console.log('No detections in this frame');
       }
       break;
       
     case 'error':
-      console.error('Error del servidor:', data.error);
+      console.error('Server error:', data.error);
       break;
       
     case 'ack':
@@ -382,17 +382,17 @@ ws.onmessage = (event) => {
   }
 };
 
-// Conexión cerrada
+// Connection closed
 ws.onclose = () => {
-  console.log('❌ WebSocket desconectado');
+  console.log('❌ WebSocket disconnected');
 };
 
-// Error en la conexión
+// Connection error
 ws.onerror = (error) => {
-  console.error('Error en WebSocket:', error);
+  console.error('WebSocket error:', error);
 };
 
-// Función para enviar frames
+// Function to capture and send frames
 function startSendingFrames() {
   const video = document.getElementById('video');
   const canvas = document.createElement('canvas');
@@ -401,35 +401,36 @@ function startSendingFrames() {
   setInterval(() => {
     if (ws.readyState !== WebSocket.OPEN) return;
     
-    // Capturar frame del video
+    // Capture frame from video
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     ctx.drawImage(video, 0, 0);
     
-    // Convertir a blob y enviar
+    // Convert to blob and send
     canvas.toBlob((blob) => {
       if (blob && ws.readyState === WebSocket.OPEN) {
         ws.send(blob);
       }
     }, 'image/jpeg', 0.85);
-  }, 1000);  // 1 frame por segundo
+  }, 1000);  // 1 frame per second
 }
 ```
 
-#### Ejemplo con Python (websockets)
+#### Example using Python (websockets)
 
 ```python
 import asyncio
 import websockets
 import cv2
+import json
 
 async def detect_realtime():
     uri = "ws://localhost:8000/api/v1/realtime/"
     
     async with websockets.connect(uri) as websocket:
-        print("✅ Conectado")
+        print("✅ Connected")
         
-        # Capturar video
+        # Capture video from webcam
         cap = cv2.VideoCapture(0)
         
         while True:
@@ -437,20 +438,20 @@ async def detect_realtime():
             if not ret:
                 break
             
-            # Codificar frame a JPEG
+            # Encode frame as JPEG
             _, buffer = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 85])
             
-            # Enviar
+            # Send binary data
             await websocket.send(buffer.tobytes())
             
-            # Recibir respuesta
+            # Receive response
             response = await websocket.recv()
             data = json.loads(response)
             
             if data.get("ok"):
-                print(f"Códigos: {data['barcodes']}")
+                print(f"Codes: {data['barcodes']}")
             
-            # Esperar 1 segundo
+            # Wait 1 second
             await asyncio.sleep(1)
         
         cap.release()
@@ -458,37 +459,37 @@ async def detect_realtime():
 asyncio.run(detect_realtime())
 ```
 
-#### Mejores Prácticas
+#### Best Practices
 
-1. **Backpressure Control**: Verifica `ws.bufferedAmount` antes de enviar
+1. **Backpressure Control**: Check `ws.bufferedAmount` before sending frames
    ```javascript
    if (ws.bufferedAmount > 512 * 1024) {
-     console.log('Buffer lleno, saltando frame');
+     console.log('Buffer full, skipping frame');
      return;
    }
    ```
 
-2. **Frame Rate**: No envíes más de 2-3 frames por segundo
+2. **Frame Rate**: Avoid sending more than 2-3 frames per second
    ```javascript
-   const FRAME_INTERVAL = 1000; // 1 segundo
+   const FRAME_INTERVAL = 1000; // 1 second
    ```
 
-3. **Calidad de Imagen**: Usa JPEG con calidad 0.80-0.90
+3. **Image Quality**: Use JPEG with quality 0.80-0.90 to balance bandwidth and accuracy
    ```javascript
    canvas.toBlob(blob => ws.send(blob), 'image/jpeg', 0.85);
    ```
 
-4. **Manejo de Reconexión**:
+4. **Reconnection Logic**:
    ```javascript
    ws.onclose = () => {
      setTimeout(() => {
-       console.log('Reintentando conexión...');
+       console.log('Reconnecting...');
        connectWebSocket();
      }, 2000);
    };
    ```
 
-5. **Timeout**: Establece un timeout para frames sin respuesta
+5. **Timeout**: Implement client-side timeouts for silent connections
    ```javascript
    let lastResponseTime = Date.now();
    
@@ -498,69 +499,66 @@ asyncio.run(detect_realtime())
    
    setInterval(() => {
      if (Date.now() - lastResponseTime > 5000) {
-       console.warn('Sin respuesta en 5 segundos');
-       ws.close();
+        console.warn('No response in 5 seconds, closing socket');
+        ws.close();
      }
    }, 1000);
    ```
 
 ---
 
-### 4. Documentación Interactiva (Swagger)
+### 4. Interactive Documentation (Swagger)
 
 ```http
 GET /docs
 ```
 
-Interfaz web interactiva para probar la API.
+Interactive web UI to test and explore the API.
 
-#### Características
+#### Features
+- 📖 Complete endpoint documentation
+- 🧪 Execute endpoints directly from the browser
+- 📋 Request/Response examples
+- 🔍 Data schemas validation
 
-- 📖 Documentación completa de endpoints
-- 🧪 Probar endpoints directamente desde el navegador
-- 📋 Ejemplos de request/response
-- 🔍 Schemas de datos
-
-#### Acceso
-
+#### Access
 ```
 http://localhost:8000/docs
 ```
 
 ---
 
-### 5. ReDoc (Documentación Alternativa)
+### 5. ReDoc (Alternative UI)
 
 ```http
 GET /redoc
 ```
 
-Documentación en formato ReDoc (más legible).
+Alternative API documentation formatted with ReDoc layout.
 
-#### Acceso
-
+#### Access
 ```
 http://localhost:8000/redoc
 ```
 
 ---
 
-## 📊 Códigos de Estado HTTP
+## 📊 HTTP Status Codes
 
-| Código | Significado | Cuándo ocurre |
-|--------|-------------|---------------|
-| 200 | OK | Solicitud procesada correctamente |
-| 400 | Bad Request | Archivo inválido o parámetros incorrectos |
-| 404 | Not Found | Endpoint no existe |
-| 413 | Payload Too Large | Archivo demasiado grande (>10MB) |
-| 422 | Unprocessable Entity | Validación de parámetros falló |
-| 500 | Internal Server Error | Error interno del servidor |
+| Code | Label | Trigger |
+|------|-------|---------|
+| 200 | OK | Request processed successfully |
+| 400 | Bad Request | Invalid file type or incorrect parameters |
+| 404 | Not Found | Endpoint does not exist |
+| 413 | Payload Too Large | File size exceeds limit (>10MB) |
+| 422 | Unprocessable Entity | Parameter validation failed |
+| 500 | Internal Server Error | Server-side execution error |
 
 ---
 
 ## 🔐 CORS (Cross-Origin Resource Sharing)
 
-La API tiene CORS habilitado para todos los orígenes:
+The API is configured to accept CORS requests from all origins:
 
 ```python
 app.add_middleware(
@@ -571,24 +569,24 @@ app.add_middleware(
 )
 ```
 
-**Implicaciones**:
-- ✅ Puedes llamar la API desde cualquier origen
-- ✅ No necesitas configuración especial en el cliente
-- ⚠️ En producción, considera restringir `allow_origins`
+**Implications**:
+- ✅ You can invoke the API directly from any client-side website.
+- ✅ No special headers setup is required on the client side.
+- ⚠️ In production, consider restricting `allow_origins` to trusted domains.
 
 ---
 
 ## 🚀 Rate Limiting
 
-**Estado actual**: No implementado
+**Current State**: Not implemented at application level.
 
-**Recomendación para producción**:
-- Límite sugerido: 100 requests/minuto por IP
-- WebSocket: Máximo 10 conexiones simultáneas por IP
+**Production Recommendations**:
+- Suggested REST API rate limit: 100 requests/minute per IP.
+- WebSocket limit: Maximum of 10 simultaneous connections per IP.
 
 ---
 
-## 📝 Tipos de Datos
+## 📝 Data Types
 
 ### BarcodeResponse
 
@@ -605,10 +603,10 @@ interface BarcodeResponse {
 
 ```typescript
 interface Location {
-  x: number;        // Coordenada X
-  y: number;        // Coordenada Y
-  width: number;    // Ancho en píxeles
-  height: number;   // Alto en píxeles
+  x: number;        // X coordinate of top-left corner
+  y: number;        // Y coordinate of top-left corner
+  width: number;    // Width in pixels
+  height: number;   // Height in pixels
 }
 ```
 
@@ -643,7 +641,7 @@ interface WebSocketError {
 
 ## 🧪 Testing
 
-### Ejemplo de Test con pytest
+### Example Test using pytest
 
 ```python
 from fastapi.testclient import TestClient
@@ -670,33 +668,33 @@ def test_image_detection():
 
 def test_websocket():
     with client.websocket_connect("/api/v1/realtime/") as ws:
-        # Enviar frame de prueba
+        # Send a sample test frame
         with open("test_frame.jpg", "rb") as f:
             ws.send_bytes(f.read())
         
-        # Recibir respuesta
+        # Receive result
         data = ws.receive_json()
         assert data["type"] == "result"
 ```
 
 ---
 
-## 📚 Recursos Adicionales
+## 📚 Additional Resources
 
 - **OpenAPI Spec**: http://localhost:8000/openapi.json
 - **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
+- **ReDoc UI**: http://localhost:8000/redoc
 
 ---
 
-## 🆘 Soporte
+## 🆘 Support
 
-Para reportar bugs o solicitar features:
+To report bugs or request features:
 - **GitHub Issues**: [github.com/Futurion-partners/Omnilector/issues](https://github.com/Futurion-partners/Omnilector/issues)
 - **Email**: support@futurion.com
 
 ---
 
-**Última actualización**: Octubre 6, 2025  
-**Versión API**: v1  
-**Versión Documento**: 1.0.0
+**Last update**: October 6, 2025  
+**API Version**: v1  
+**Document Version**: 1.0.0

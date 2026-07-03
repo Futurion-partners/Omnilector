@@ -1,7 +1,6 @@
-#  Guía de Inicio Rápido 
+# Quick Start Guide
 
-
-### Paso 1: Instalar uv (Gestor de Paquetes)
+### Step 1: Install uv (Package Manager)
 
 **Windows (PowerShell)**:
 ```powershell
@@ -13,147 +12,147 @@ powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-### Paso 2: Clonar el Proyecto
+### Step 2: Clone the Project
 
 ```bash
 git clone https://github.com/Futurion-partners/Omnilector.git
 cd Omnilector
 ```
 
-### Paso 3: Instalar Dependencias
+### Step 3: Install Dependencies
 
 ```bash
 uv sync
 ```
 
-### Paso 4: Ejecutar el Servidor
+### Step 4: Run the Server
 
 ```bash
 uv run omnilector-dev
 ```
 
-### Paso 5: Abrir el Cliente Web
+### Step 5: Open the Web Client
 
-Abre tu navegador en: **http://localhost:8000**
-
----
-
-## 🎯 Uso Básico
-
-### Opción A: Escaneo en Tiempo Real
-
-1. **Iniciar Cámara** → Haz clic en 📷 "Iniciar Cámara"
-2. **Permitir acceso** → Autoriza el acceso a la cámara cuando el navegador lo solicite
-3. **Conectar WebSocket** → Haz clic en 🔌 "Conectar WebSocket"
-4. **Escanear** → Apunta tu cámara al código de barras
-5. **Mantén enfocado** → Mantén el código dentro del recuadro verde
-6. **Confirmación** → Espera la confirmación (2 detecciones consecutivas)
-7. **Resultado** → El código aparecerá en pantalla con fondo verde
-8. **Siguiente código** → Haz clic en "🔍 Escanear Otro"
-
-### Opción B: Subir Imagen
-
-1. **Seleccionar archivo** → Haz clic en el botón de selección de archivo
-2. **Elegir imagen** → Selecciona una foto con códigos de barras
-3. **Ver resultado** → El código se mostrará automáticamente
+Open your browser at: **http://localhost:8000**
 
 ---
 
-## ⚙️ Configuración Recomendada
+## 🎯 Basic Usage
 
-### Para Códigos Normales
-- **Resolución**: 1280x720
-- **Calidad JPEG**: 0.85
-- **Intervalo**: 1200 ms
+### Option A: Real-Time Scanning
 
-### Para Códigos Pequeños o Difíciles
-- **Resolución**: 1920x1080
-- **Calidad JPEG**: 0.95
-- **Intervalo**: 1500 ms
-- **Activar**: ☑️ Modo PNG sin pérdida
+1. **Start Camera** → Click 📷 "Start Camera"
+2. **Allow access** → Grant camera access when requested by the browser
+3. **Connect WebSocket** → Click 🔌 "Connect WebSocket"
+4. **Scan** → Point your camera at a barcode or QR code
+5. **Keep focused** → Keep the barcode within the green Region of Interest (ROI) box
+6. **Confirmation** → Wait for confirmation (requires 2 consecutive identical detections)
+7. **Result** → The detected code will appear on screen with a green background
+8. **Next scan** → Click "🔍 Scan Another"
 
-### Para Conexiones Lentas
-- **Resolución**: 960x720
-- **Calidad JPEG**: 0.70
-- **Intervalo**: 2000 ms
+### Option B: Upload Image
+
+1. **Select file** → Click the file selection button
+2. **Choose image** → Select a photo containing barcodes
+3. **View result** → The detected code will be displayed automatically
 
 ---
 
-## 🐳 Alternativa con Docker
+## ⚙️ Recommended Configuration
 
-### Construir y Ejecutar
+### For Standard Barcodes
+- **Resolution**: 1280x720
+- **JPEG Quality**: 0.85
+- **Interval**: 1200 ms
+
+### For Small or Challenging Barcodes
+- **Resolution**: 1920x1080
+- **JPEG Quality**: 0.95
+- **Interval**: 1500 ms
+- **Enable**: ☑️ Lossless PNG Mode
+
+### For Slow Connections
+- **Resolution**: 960x720
+- **JPEG Quality**: 0.70
+- **Interval**: 2000 ms
+
+---
+
+## 🐳 Alternative with Docker
+
+### Build and Run
 
 ```bash
 docker build -t omnilector:latest .
 docker run --rm -p 8000:8000 omnilector:latest
 ```
 
-### Con Docker Compose
+### With Docker Compose
 
 ```bash
 docker compose up --build
 ```
 
-Accede a: **http://localhost:8000**
+Access at: **http://localhost:8000**
 
 ---
 
-## 🔗 Endpoints Principales
+## 🔗 Main Endpoints
 
-### Interfaz Web
-- **http://localhost:8000** - Redirige a /test
-- **http://localhost:8000/test** - Cliente web completo
+### Web Interface
+- **http://localhost:8000** - Redirects to /test
+- **http://localhost:8000/test** - Complete web client test page
 
-### API REST
-- **POST http://localhost:8000/api/v1/image/** - Procesar imagen estática
+### REST API
+- **POST http://localhost:8000/api/v1/image/** - Process static image
 
 ### WebSocket
-- **ws://localhost:8000/api/v1/realtime/** - Conexión en tiempo real
+- **ws://localhost:8000/api/v1/realtime/** - Real-time connection endpoint
 
-### Utilidades
-- **http://localhost:8000/docs** - Documentación interactiva (Swagger)
-- **http://localhost:8000/health** - Health check
+### Utilities
+- **http://localhost:8000/docs** - Interactive Swagger UI documentation
+- **http://localhost:8000/health** - Health check endpoint
 
 ---
 
-## 📱 Uso desde Móvil
+## 📱 Usage from Mobile
 
-### En la Misma Red WiFi
+### On the Same Wi-Fi Network
 
-1. **Encuentra tu IP local**:
+1. **Find your local IP**:
    
    **Windows**:
    ```powershell
    ipconfig
    ```
-   Busca "IPv4 Address" (ej: 192.168.1.100)
+   Look for "IPv4 Address" (e.g., 192.168.1.100)
    
    **Linux/macOS**:
    ```bash
    ifconfig | grep "inet "
    ```
 
-2. **Accede desde tu móvil**:
+2. **Access from your mobile device**:
    ```
    http://192.168.1.100:8000
    ```
-   (Reemplaza con tu IP)
+   (Replace with your actual local IP address)
 
-3. **Permite acceso a la cámara** cuando el navegador lo solicite
+3. **Allow camera access** when prompted by your mobile browser.
 
 ---
 
-## 🧪 Probar la API con curl
+## 🧪 Testing the API with curl
 
-### Subir una Imagen
+### Upload an Image
 
 ```bash
 curl -X POST "http://localhost:8000/api/v1/image/" \
   -H "Content-Type: multipart/form-data" \
-  -F "file=@mi_codigo.jpg"
+  -F "file=@my_code.jpg"
 ```
 
-### Respuesta Esperada
+### Expected Response
 
 ```json
 {
@@ -173,7 +172,7 @@ curl -X POST "http://localhost:8000/api/v1/image/" \
 
 ---
 
-## 🔍 Verificar que Todo Funciona
+## 🔍 Verifying Everything Works
 
 ### 1. Health Check
 
@@ -181,70 +180,70 @@ curl -X POST "http://localhost:8000/api/v1/image/" \
 curl http://localhost:8000/health
 ```
 
-Debe retornar: `{"status":"ok"}`
+Should return: `{"status":"ok"}`
 
-### 2. Verificar Logs del Servidor
+### 2. Verify Server Logs
 
-Deberías ver:
+You should see:
 ```
 INFO:     Uvicorn running on http://0.0.0.0:8000
 INFO:     Application startup complete.
 ```
 
-### 3. Abrir en Navegador
+### 3. Open in Browser
 
-Ve a http://localhost:8000 y verifica que cargue la interfaz.
+Go to http://localhost:8000 and verify the interface loads correctly.
 
 ---
 
-## ❌ Solución Rápida de Problemas
+## ❌ Quick Troubleshooting
 
-### "No puedo acceder a la cámara"
-- ✅ Verifica permisos del navegador (ícono de cámara en barra de direcciones)
-- ✅ Usa HTTPS en producción (localhost funciona con HTTP)
-- ✅ Cierra otras apps que usen la cámara
-- ✅ **Alternativa**: Usa la opción de subir archivo
+### "I cannot access the camera"
+- ✅ Check browser permissions (camera icon in the address bar).
+- ✅ Use HTTPS in production (localhost works fine with HTTP).
+- ✅ Close other apps that may be using the camera.
+- ✅ **Alternative**: Use the "Upload Image" option instead.
 
-### "WebSocket no conecta"
-- ✅ Verifica que el servidor esté corriendo
-- ✅ Revisa que no haya firewall bloqueando el puerto 8000
-- ✅ Si estás en red local, usa la IP correcta
+### "WebSocket does not connect"
+- ✅ Verify the server is running.
+- ✅ Ensure no firewall is blocking port 8000.
+- ✅ If on a local network, double-check your IP address.
 
-### "No se detectan códigos"
-- ✅ Asegúrate de que el código esté dentro del **recuadro verde**
-- ✅ Mejora la iluminación
-- ✅ Mantén la cámara estable 1-2 segundos
-- ✅ Aumenta la calidad JPEG a 0.90-0.95
-- ✅ Activa "Modo PNG sin pérdida"
+### "No codes are detected"
+- ✅ Ensure the code is inside the **green ROI box**.
+- ✅ Improve the lighting.
+- ✅ Keep the camera steady for 1-2 seconds.
+- ✅ Increase JPEG quality to 0.90-0.95.
+- ✅ Enable "Lossless PNG Mode".
 
 ### "ModuleNotFoundError"
 ```bash
-uv sync  # Reinstalar dependencias
+uv sync  # Reinstall dependencies
 ```
 
 ---
 
-## 📚 Documentación Completa
+## 📚 Complete Documentation
 
-Para más detalles, consulta:
-- **DOCUMENTATION.md** - Documentación completa del proyecto
-- **FRONTEND_GUIDE.md** - Guía detallada del cliente web
-- **README.md** - Documentación técnica
+For more details, see:
+- **DOCUMENTATION.md** - Comprehensive project documentation
+- **FRONTEND_GUIDE.md** - Detailed web client guide
+- **README.md** - Technical quick reference
 
 ---
 
-## 🆘 Soporte
+## 🆘 Support
 
 - **GitHub Issues**: [github.com/Futurion-partners/Omnilector/issues](https://github.com/Futurion-partners/Omnilector/issues)
 - **Email**: support@futurion.com
 
 ---
 
-## 🎉 ¡Listo!
+## 🎉 Ready!
 
-Ya tienes todo configurado. Prueba escaneando:
-- Códigos de barras de productos
-- Códigos QR de sitios web
-- Códigos en documentos impresos
+You are all set. Try scanning:
+- Product barcodes (EAN/UPC)
+- QR codes from websites
+- Codes on printed documents
 
-**Consejo**: Para mejores resultados, mantén el código centrado en el recuadro verde y espera 1-2 segundos sin mover la cámara.
+**Tip**: For best results, keep the code centered in the green box and hold steady for 1-2 seconds.

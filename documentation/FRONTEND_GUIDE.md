@@ -1,38 +1,38 @@
-# 🎨 Guía Completa del Frontend - Cliente Web de Detección de Códigos
+# 🎨 Complete Frontend Guide - Web Client for Barcode Detection
 
-## Tabla de Contenidos
-1. [Introducción](#introducción)
-2. [Arquitectura del Cliente](#arquitectura-del-cliente)
-3. [Variables Globales](#variables-globales)
-4. [Funciones Principales](#funciones-principales)
-5. [Gestión de Cámara](#gestión-de-cámara)
-6. [Sistema WebSocket](#sistema-websocket)
-7. [Procesamiento de Frames](#procesamiento-de-frames)
-8. [Sistema ROI (Region of Interest)](#sistema-roi-region-of-interest)
-9. [Sistema de Confianza](#sistema-de-confianza)
-10. [Optimizaciones](#optimizaciones)
-11. [Flujo de Datos](#flujo-de-datos)
+## Table of Contents
+1. [Introduction](#introduction)
+2. [Client Architecture](#client-architecture)
+3. [Global Variables](#global-variables)
+4. [Key Functions](#key-functions)
+5. [Camera Management](#camera-management)
+6. [WebSocket System](#websocket-system)
+7. [Frame Processing](#frame-processing)
+8. [ROI (Region of Interest) System](#roi-system-region-of-interest)
+9. [Confidence System](#confidence-system)
+10. [Optimizations](#optimizations)
+11. [Data Flow](#data-flow)
 
 ---
 
-## Introducción
+## Introduction
 
-El cliente web es una aplicación HTML5 que utiliza las APIs modernas del navegador para:
-- Capturar video desde la cámara del dispositivo
-- Procesar frames en tiempo real
-- Comunicarse con el backend vía WebSocket
-- Mostrar resultados visuales con overlay dinámico
+The web client is an HTML5 application that utilizes modern browser APIs to:
+- Capture video input from the device's camera.
+- Process frames in real-time.
+- Communicate with the backend via WebSockets.
+- Display visual results with a dynamic overlay box.
 
-**Tecnologías utilizadas**:
+**Key Technologies Used**:
 - HTML5 Canvas API
-- MediaDevices API (getUserMedia)
+- MediaDevices API (`getUserMedia`)
 - WebSocket API
 - Blob API
 - CSS3 Flexbox/Grid
 
 ---
 
-## Arquitectura del Cliente
+## Client Architecture
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -75,77 +75,51 @@ El cliente web es una aplicación HTML5 que utiliza las APIs modernas del navega
 
 ---
 
-## Variables Globales
+## Global Variables
 
-### Estado del Video
+### Video State
 ```javascript
 let video = document.getElementById('video');
 let canvas = document.getElementById('canvas');
 let ctx = canvas.getContext('2d');
-let stream = null;  // MediaStream de la cámara
+let stream = null;  // MediaStream from the camera
 ```
 
-**Propósito**:
-- `video`: Elemento `<video>` que muestra el feed de la cámara
-- `canvas`: Canvas oculto para captura de frames
-- `ctx`: Contexto 2D del canvas para dibujar
-- `stream`: Referencia al MediaStream para control y cleanup
+**Purpose**:
+- `video`: The `<video>` element rendering the live camera feed.
+- `canvas`: A hidden canvas used for raw frame capture.
+- `ctx`: The 2D rendering context of the canvas.
+- `stream`: Reference to the active `MediaStream` for state control and cleanup.
 
-### Estado de WebSocket
+### WebSocket State
 ```javascript
-let ws = null;              // Conexión WebSocket
-let isProcessing = false;   // Flag de procesamiento en curso
-let isSendingFrames = false; // Flag de bucle de envío activo
+let ws = null;              // WebSocket connection instance
+let isProcessing = false;   // Flag to avoid processing overlapping frames
+let isSendingFrames = false; // Flag to track frame capture loop activity
 ```
 
-**Propósito**:
-- `ws`: Instancia de WebSocket para comunicación con el servidor
-- `isProcessing`: Evita enviar múltiples frames mientras se procesa uno
-- `isSendingFrames`: Previene múltiples bucles de envío simultáneos
+**Purpose**:
+- `ws`: Main WebSocket connector.
+- `isProcessing`: Prevents firing off multiple concurrent frames while one is already in flight.
+- `isSendingFrames`: Prevents duplicate request loops from running simultaneously.
 
-### Sistema de Confianza
+### Confidence System State
 ```javascript
-let isLocked = false;           // Detección bloqueada
-let lockedBarcode = null;       // Código confirmado actual
-let detectionConfidence = 0;    // Contador de detecciones consecutivas
-const CONFIDENCE_THRESHOLD = 2; // Número de detecciones para confirmar
+let isLocked = false;           // State lock when code is verified
+let lockedBarcode = null;       // Current verified barcode
+let detectionConfidence = 0;    // Count of consecutive identical detections
+const CONFIDENCE_THRESHOLD = 2; // Required reads before confirmation lock
 ```
 
-**Propósito**:
-- `isLocked`: Cuando `true`, detiene el envío de frames y muestra resultado final
-- `lockedBarcode`: Almacena el código que se está confirmando
-- `detectionConfidence`: Contador incrementado en cada detección del mismo código
-- `CONFIDENCE_THRESHOLD`: Umbral para considerar una detección como válida
-
-### Métricas
-```javascript
-let frameCount = 0;      // Total de frames enviados
-let detectionCount = 0;  // Total de detecciones exitosas
-```
-
-**Propósito**: Tracking de rendimiento y tasa de éxito.
-
-### Canvas Reutilizable
-```javascript
-let roiCanvas = null;  // Canvas temporal para ROI
-```
-
-**Propósito**: Evitar crear canvas nuevos en cada frame (optimización de memoria).
-
-### Elementos de Configuración
-```javascript
-const resolutionSel = document.getElementById('resolution');
-const jpegQualityInput = document.getElementById('jpegQuality');
-const jpegQualityValue = document.getElementById('jpegQualityValue');
-const frameIntervalInput = document.getElementById('frameInterval');
-const pngModeCheckbox = document.getElementById('pngMode');
-const autoFocusCheckbox = document.getElementById('autoFocusMode');
-const disableZoomCheckbox = document.getElementById('disableZoom');
-```
+**Purpose**:
+- `isLocked`: When `true`, halts capture stream and locks the result on the UI.
+- `lockedBarcode`: Barcode currently undergoing validation.
+- `detectionConfidence`: Counter tracking consecutive reads of the same barcode value.
+- `CONFIDENCE_THRESHOLD`: Limit target to consider a read validated.
 
 ---
 
-## Funciones Principales
+## Key Functions
 
 ### 1. `getSelectedResolution()`
 
@@ -156,16 +130,9 @@ function getSelectedResolution() {
 }
 ```
 
-**Descripción**: Extrae la resolución seleccionada del dropdown.
+**Description**: Parses selected viewport resolution from user preferences dropdown.
 
-**Retorna**: `{ width: number, height: number }`
-
-**Ejemplo**:
-```javascript
-const res = getSelectedResolution();
-// Si está seleccionado "1280x720"
-// res = { width: 1280, height: 720 }
-```
+**Returns**: `{ width: number, height: number }`
 
 ---
 
@@ -199,25 +166,7 @@ async function selectBestBackCamera() {
 }
 ```
 
-**Descripción**: Selecciona inteligentemente la mejor cámara trasera disponible.
-
-**Algoritmo**:
-1. Enumera todos los dispositivos de video
-2. Asigna puntuación a cada cámara basándose en su etiqueta:
-   - **+10 puntos**: Contiene "back", "rear", "environment"
-   - **+5 puntos**: Es "camera 0" (generalmente la principal)
-   - **+8 puntos**: Contiene "main"
-   - **-100 puntos**: Es frontal (selfie)
-   - **-20 puntos**: Es gran angular (ultra-wide)
-   - **-15 puntos**: Es teleobjetivo (zoom)
-3. Ordena por puntuación y retorna la mejor
-
-**Casos de uso**:
-- Dispositivos con múltiples cámaras traseras (ej: iPhone 13 Pro con 3 cámaras)
-- Evitar selección de cámara frontal por error
-- Priorizar cámara principal sobre gran angular o tele
-
-**Retorna**: `MediaDeviceInfo | null`
+**Description**: Employs heuristic scoring to filter out selfie/wide-angle/telephoto lenses and find the main back camera.
 
 ---
 
@@ -227,16 +176,16 @@ async function selectBestBackCamera() {
 async function startCameraWithBestSelection() {
     const { width, height } = getSelectedResolution();
     
-    // 1. Obtener permisos primero
+    // 1. Fetch initial permissions to access labels
     let initialStream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'environment' }
     });
     
-    // 2. Seleccionar mejor cámara (ahora con labels disponibles)
+    // 2. Select optimal camera (now labels are populated)
     const bestCamera = await selectBestBackCamera();
     initialStream.getTracks().forEach(t => t.stop());
     
-    // 3. Abrir con la cámara seleccionada
+    // 3. Open selected camera stream
     const constraints = {
         video: bestCamera ? {
             deviceId: { exact: bestCamera.deviceId },
@@ -251,7 +200,7 @@ async function startCameraWithBestSelection() {
     
     stream = await navigator.mediaDevices.getUserMedia(constraints);
     
-    // 4. Verificar que NO sea frontal
+    // 4. Double check that we are not using a front-facing camera
     const videoTrack = stream.getVideoTracks()[0];
     const settings = videoTrack.getSettings();
     const label = videoTrack.label.toLowerCase();
@@ -260,7 +209,7 @@ async function startCameraWithBestSelection() {
                    /front|user|selfie|face/.test(label);
     
     if (isFront) {
-        // Reintentar sin deviceId exacto
+        // Fallback without exact deviceId
         stream.getTracks().forEach(t => t.stop());
         stream = await navigator.mediaDevices.getUserMedia({
             video: {
@@ -271,7 +220,7 @@ async function startCameraWithBestSelection() {
         });
     }
     
-    // 5. Configurar zoom y enfoque
+    // 5. Apply zoom and focus capabilities
     const capabilities = videoTrack.getCapabilities();
     const config = {};
     
@@ -295,19 +244,7 @@ async function startCameraWithBestSelection() {
 }
 ```
 
-**Descripción**: Flujo completo de inicialización de cámara con selección inteligente.
-
-**Pasos**:
-1. **Solicitar permisos**: Primer getUserMedia para que `enumerateDevices` tenga labels
-2. **Seleccionar mejor cámara**: Ejecuta el algoritmo de scoring
-3. **Abrir cámara elegida**: Con `deviceId` específico
-4. **Validar no sea frontal**: Doble verificación de seguridad
-5. **Optimizar zoom**: Ajustar a 1.0x (cámara principal) si está en gran angular o tele
-6. **Habilitar enfoque continuo**: Si está disponible
-
-**Por qué dos getUserMedia**:
-- Primera llamada: Obtener permisos → Permite que `enumerateDevices` retorne labels
-- Segunda llamada: Abrir cámara específica con toda la información disponible
+**Description**: The full camera initiation flow. Grabs browser permissions, resolves devices, verifies target lens, and applies autofocus.
 
 ---
 
@@ -316,7 +253,7 @@ async function startCameraWithBestSelection() {
 ```javascript
 async function startCamera() {
     try {
-        // Polyfill para navegadores antiguos
+        // Polyfill fallback
         if (!navigator.mediaDevices) {
             navigator.mediaDevices = {};
         }
@@ -328,7 +265,7 @@ async function startCamera() {
                                    navigator.msGetUserMedia;
                 
                 if (!getUserMedia) {
-                    return Promise.reject(new Error('getUserMedia no soportado'));
+                    return Promise.reject(new Error('getUserMedia not supported'));
                 }
                 
                 return new Promise((resolve, reject) => {
@@ -349,32 +286,25 @@ async function startCamera() {
         });
         
     } catch (err) {
-        let errorMsg = 'Error al acceder a la cámara: ';
+        let errorMsg = 'Error accessing camera: ';
         
         if (err.name === 'NotAllowedError') {
-            errorMsg += 'Permisos denegados. Permite el acceso a la cámara.';
+            errorMsg += 'Permissions denied. Please allow camera access.';
         } else if (err.name === 'NotFoundError') {
-            errorMsg += 'No se encontró ninguna cámara.';
+            errorMsg += 'No camera found.';
         } else if (err.message === 'FrontCameraSelectedAfterFiltering') {
-            errorMsg = 'No se pudo seleccionar cámara trasera.';
+            errorMsg = 'Could not select rear camera.';
         } else {
             errorMsg += err.message;
         }
         
         alert(errorMsg);
-        console.error('Error completo:', err);
+        console.error(err);
     }
 }
 ```
 
-**Descripción**: Punto de entrada público para iniciar la cámara.
-
-**Responsabilidades**:
-- Detectar soporte de getUserMedia (con polyfills)
-- Llamar a la función de selección de cámara
-- Configurar UI (botones)
-- Inicializar canvas cuando el video cargue
-- Manejo de errores amigable
+**Description**: Main entrypoint handler to launch the camera feed, bind canvas sizes, and format error prompts.
 
 ---
 
@@ -393,18 +323,9 @@ function stopCamera() {
 }
 ```
 
-**Descripción**: Detiene la cámara y libera recursos.
-
-**Pasos**:
-1. Detiene todos los tracks del MediaStream (importante para liberar la cámara)
-2. Limpia la referencia al stream
-3. Desvincula el video element
-4. Actualiza estado de botones
-5. Oculta el overlay verde
-
 ---
 
-## Sistema WebSocket
+## WebSocket System
 
 ### 6. `connectWebSocket()`
 
@@ -414,8 +335,8 @@ function connectWebSocket() {
         ws = new WebSocket(WS_URL);
         
         ws.onopen = function(event) {
-            console.log('WebSocket conectado');
-            document.getElementById('status').textContent = 'Conectado ✅';
+            console.log('WebSocket connected');
+            document.getElementById('status').textContent = 'Connected ✅';
             document.getElementById('status').className = 'status connected';
             document.getElementById('connectBtn').disabled = true;
             document.getElementById('disconnectBtn').disabled = false;
@@ -425,55 +346,44 @@ function connectWebSocket() {
         
         ws.onmessage = function(event) {
             const data = JSON.parse(event.data);
-            console.log('📨 Respuesta recibida:', data);
+            console.log('📨 Message received:', data);
             
             if (data.ok && data.barcodes && data.barcodes.length > 0) {
                 detectionCount++;
                 const timestamp = new Date().toLocaleTimeString();
                 const successRate = ((detectionCount / frameCount) * 100).toFixed(1);
-                console.log(`✅ ${timestamp} - DETECCIÓN: ${data.barcodes.length} códigos (${successRate}% éxito)`);
+                console.log(`✅ ${timestamp} - DETECTED: ${data.barcodes.length} codes (${successRate}% success rate)`);
             }
             
             displayResults(data);
         };
         
         ws.onclose = function(event) {
-            console.log('WebSocket desconectado');
-            document.getElementById('status').textContent = 'Desconectado ❌';
+            console.log('WebSocket disconnected');
+            document.getElementById('status').textContent = 'Disconnected ❌';
             document.getElementById('status').className = 'status disconnected';
             document.getElementById('connectBtn').disabled = false;
             document.getElementById('disconnectBtn').disabled = true;
             
-            // Mostrar mensaje en UI
             const resultsDiv = document.getElementById('barcodeResults');
             resultsDiv.innerHTML = `
                 <div style="padding: 15px; background: #fff3cd; border: 2px solid #ffc107;">
-                    <h4>⚠️ WebSocket desconectado</h4>
-                    <p>Para iniciar el escaneo, haz clic en: <strong>🔌 Conectar WebSocket</strong></p>
+                    <h4>⚠️ WebSocket disconnected</h4>
+                    <p>Click: <strong>🔌 Connect WebSocket</strong> to scan.</p>
                 </div>
             `;
         };
         
         ws.onerror = function(error) {
-            console.error('Error WebSocket:', error);
-            alert('Error de conexión. Verifica que el servidor esté funcionando.');
+            console.error('WebSocket Error:', error);
+            alert('Connection error. Verify the server is running.');
         };
         
     } catch (err) {
-        alert('Error al conectar WebSocket: ' + err.message);
+        alert('WebSocket connect failed: ' + err.message);
     }
 }
 ```
-
-**Descripción**: Establece y gestiona la conexión WebSocket.
-
-**Event Handlers**:
-- **onopen**: Conexión establecida → Inicia envío de frames
-- **onmessage**: Mensaje recibido → Procesa y muestra resultados
-- **onclose**: Conexión cerrada → Actualiza UI y muestra advertencia
-- **onerror**: Error en conexión → Notifica al usuario
-
-**Logging**: Registra métricas de detección y tasa de éxito.
 
 ---
 
@@ -493,76 +403,65 @@ function disconnectWebSocket() {
     
     frameCount = 0;
     detectionCount = 0;
-    console.log('🔌 WebSocket desconectado - Contadores reiniciados');
+    console.log('🔌 WebSocket disconnected - counters reset');
     
     const resultsDiv = document.getElementById('barcodeResults');
     resultsDiv.innerHTML = `
         <div style="padding: 15px; background: #fff3cd;">
-            <h4>⚠️ WebSocket desconectado</h4>
-            <p>Haz clic en <strong>🔌 Conectar WebSocket</strong> para reiniciar</p>
+            <h4>⚠️ WebSocket disconnected</h4>
+            <p>Click <strong>🔌 Connect WebSocket</strong> to resume.</p>
         </div>
     `;
 }
 ```
 
-**Descripción**: Cierra la conexión y resetea todo el estado.
-
-**Limpieza**:
-- Cierra el WebSocket
-- Resetea flags de bloqueo y confianza
-- Resetea contadores de métricas
-- Actualiza UI para mostrar estado desconectado
-
 ---
 
-## Procesamiento de Frames
+## Frame Processing
 
 ### 8. `startSendingFrames()`
 
 ```javascript
 function startSendingFrames() {
     if (isSendingFrames) {
-        console.log('⚠️ Ya hay un bucle activo');
+        console.log('⚠️ Frame loop is already active');
         return;
     }
     
     isSendingFrames = true;
     let frameSkipCounter = 0;
-    const FRAME_SKIP = 9;  // Procesar 1 de cada 10 frames
-    const MAX_BUFFERED = 512 * 1024;  // 512KB backpressure threshold
+    const FRAME_SKIP = 9;  // Process 1 out of every 10 frames
+    const MAX_BUFFERED = 512 * 1024;  // 512KB congestion threshold
     const MAX_ROI_W = 640;
     const MAX_ROI_H = 360;
     
     function sendFrame() {
-        // 1. Si bloqueado, detener completamente
         if (isLocked) {
-            console.log('🔒 Bloqueado - pausando envío');
+            console.log('🔒 Locked - pausing capture loop');
             isSendingFrames = false;
             return;
         }
         
-        // 2. Si WS no está abierto, esperar
         if (!ws || ws.readyState !== WebSocket.OPEN) {
             const intervalMs = Number(frameIntervalInput.value) || 1200;
             setTimeout(sendFrame, intervalMs);
             return;
         }
         
-        // 3. Backpressure: si hay mucha cola, saltar
+        // Check socket buffer saturation (Backpressure)
         if (ws.bufferedAmount > MAX_BUFFERED) {
             const intervalMs = Number(frameIntervalInput.value) * 1.5;
-            console.log(`⏳ WS congestionado (${(ws.bufferedAmount/1024).toFixed(0)}KB)`);
+            console.log(`⏳ Socket congested (${(ws.bufferedAmount/1024).toFixed(0)}KB)`);
             setTimeout(sendFrame, intervalMs);
             return;
         }
         
-        // 4. Si video no listo o procesando, esperar
         if (video.videoWidth <= 0 || isProcessing) {
             requestAnimationFrame(sendFrame);
             return;
         }
         
-        // 5. Frame skipping
+        // Frame skipping to preserve CPU
         frameSkipCounter++;
         if (frameSkipCounter % FRAME_SKIP !== 0) {
             requestAnimationFrame(sendFrame);
@@ -571,17 +470,15 @@ function startSendingFrames() {
         
         isProcessing = true;
         
-        // 6. Ajustar canvas
         if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
         }
         
-        // 7. Capturar y procesar frame
         requestAnimationFrame(() => {
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             
-            // Calcular ROI
+            // Map CSS coordinates to source video stream pixels (ROI extraction)
             const rect = getDisplayedVideoRect();
             const overlay = document.getElementById('scanOverlay');
             const overlayBox = overlay.getBoundingClientRect();
@@ -598,7 +495,6 @@ function startSendingFrames() {
             const sw = Math.max(1, Math.floor(overlayBox.width * scaleX));
             const sh = Math.max(1, Math.floor(overlayBox.height * scaleY));
             
-            // Canvas temporal para ROI
             if (!roiCanvas) {
                 roiCanvas = document.createElement('canvas');
             }
@@ -615,7 +511,6 @@ function startSendingFrames() {
             const tctx = roiCanvas.getContext('2d');
             tctx.drawImage(video, sx, sy, sw, sh, 0, 0, roiCanvas.width, roiCanvas.height);
             
-            // Convertir a blob y enviar
             const usePNG = !!pngModeCheckbox?.checked;
             const mime = usePNG ? 'image/png' : 'image/jpeg';
             const q = parseFloat(jpegQualityInput.value) || 0.85;
@@ -631,7 +526,6 @@ function startSendingFrames() {
             }, mime, usePNG ? undefined : q);
         });
         
-        // 8. Programar siguiente frame
         const intervalMs = Number(frameIntervalInput.value) || 1200;
         setTimeout(sendFrame, intervalMs);
     }
@@ -640,29 +534,9 @@ function startSendingFrames() {
 }
 ```
 
-**Descripción**: Bucle principal de captura, procesamiento y envío de frames.
-
-**Flujo**:
-1. **Guard checks**: Evita ejecución si ya está bloqueado o activo
-2. **WS validation**: Verifica que la conexión esté abierta
-3. **Backpressure control**: Detecta congestión y pausa envío
-4. **Video ready check**: Asegura que el video tenga dimensiones
-5. **Frame skipping**: Procesa solo 1 de cada 10 frames
-6. **Canvas resize**: Ajusta canvas al tamaño del video
-7. **ROI extraction**: Extrae solo la región visible en el overlay
-8. **Compression**: Convierte a JPEG/PNG con calidad configurable
-9. **Send**: Envía blob por WebSocket
-10. **Schedule next**: Programa siguiente frame con intervalo configurado
-
-**Optimizaciones clave**:
-- Frame skipping (90% reducción de carga)
-- Backpressure detection (evita acumulación)
-- ROI extraction (reduce bytes enviados)
-- Canvas reuse (reduce GC)
-
 ---
 
-## Sistema ROI (Region of Interest)
+## ROI (Region of Interest) System
 
 ### 9. `getDisplayedVideoRect()`
 
@@ -699,41 +573,7 @@ function getDisplayedVideoRect() {
 }
 ```
 
-**Descripción**: Calcula las dimensiones reales del video renderizado, considerando letterboxing.
-
-**Por qué es necesario**:
-- El elemento `<video>` puede tener CSS que lo escale
-- El contenido real puede tener letterboxing (barras negras)
-- Necesitamos mapear coordenadas CSS → píxeles del video fuente
-
-**Retorna**:
-```typescript
-{
-  x: number,        // Offset horizontal del contenido
-  y: number,        // Offset vertical del contenido
-  width: number,    // Ancho visible del contenido
-  height: number,   // Alto visible del contenido
-  vw: number,       // Ancho real del video (píxeles)
-  vh: number        // Alto real del video (píxeles)
-}
-```
-
-**Ejemplo**:
-```
-Video: 1920x1080
-Container: 800x600
-
-videoAspect = 1920/1080 = 1.777
-containerAspect = 800/600 = 1.333
-
-expectedH = 800 / 1.777 = 450px
-
-Como 450 < 600, hay letterboxing vertical:
-→ dispH = 450
-→ offsetY = (600 - 450) / 2 = 75px
-
-Resultado: { x: 0, y: 75, width: 800, height: 450, vw: 1920, vh: 1080 }
-```
+**Description**: Calculates actual dimensions and placement offset of the active video feed inside the layout, managing letterbox and pillarbox scenarios.
 
 ---
 
@@ -745,7 +585,7 @@ function positionOverlay() {
     const rect = getDisplayedVideoRect();
     if (!rect) return;
     
-    // ROI: 80% ancho, 30% alto, centrado
+    // ROI Box: 80% width, 30% height, centered
     const roiW = rect.width * 0.80;
     const roiH = rect.height * 0.30;
     const roiX = rect.x + (rect.width - roiW) / 2;
@@ -759,21 +599,9 @@ function positionOverlay() {
 }
 ```
 
-**Descripción**: Posiciona el recuadro verde sobre el video, alineado perfectamente con el contenido.
-
-**Cálculo del ROI**:
-- Ancho: 80% del video visible
-- Alto: 30% del video visible
-- Centrado horizontal y verticalmente
-
-**Por qué 80% x 30%**:
-- Códigos de barras 1D son rectangulares (más anchos que altos)
-- 30% de altura es suficiente para capturar toda la altura del código
-- 80% de ancho da margen para escanear códigos largos
-
 ---
 
-## Sistema de Confianza
+## Confidence System
 
 ### 11. `displayResults()`
 
@@ -781,17 +609,15 @@ function positionOverlay() {
 function displayResults(data) {
     const resultsDiv = document.getElementById('barcodeResults');
     
-    // Si bloqueado, no actualizar
     if (isLocked) {
         return;
     }
     
-    // Verificar conexión WS
     if (!ws || ws.readyState !== WebSocket.OPEN) {
         resultsDiv.innerHTML = `
             <div style="padding: 15px; background: #fff3cd;">
-                <h4>⚠️ WebSocket desconectado</h4>
-                <p>Haz clic en <strong>🔌 Conectar WebSocket</strong></p>
+                <h4>⚠️ WebSocket disconnected</h4>
+                <p>Please click <strong>🔌 Connect WebSocket</strong></p>
             </div>
         `;
         return;
@@ -803,7 +629,6 @@ function displayResults(data) {
                       ? String(data.sources[0]) 
                       : '';
         
-        // Sistema de confianza
         if (lockedBarcode === currentBarcode) {
             detectionConfidence++;
         } else {
@@ -811,7 +636,8 @@ function displayResults(data) {
             detectionConfidence = 1;
         }
         
-        // Fuentes confiables bloquean inmediatamente
+        // Strict confidence thresholds:
+        // High fidelity engines bypass multiple read constraints.
         const isReliableSource = source.toLowerCase() === 'pyzbar' || 
                                 source.toLowerCase() === 'wechat-qr';
         const shouldLock = isReliableSource || (detectionConfidence >= CONFIDENCE_THRESHOLD);
@@ -819,53 +645,36 @@ function displayResults(data) {
         if (shouldLock) {
             isLocked = true;
             
-            let html = '<h4>🔒 ¡Código detectado y confirmado!</h4>';
+            let html = '<h4>🔒 Code detected and verified!</h4>';
             html += `<div class="barcode-result confirmed-result">
-                <strong>Código:</strong> ${currentBarcode}
-                <br><small>Detectado ${detectionConfidence} veces consecutivas</small>
+                <strong>Code:</strong> ${currentBarcode}
+                <br><small>Detected ${detectionConfidence} consecutive times</small>
             </div>`;
-            html += '<button id="scanAnotherBtn" onclick="scanAnother()">🔍 Escanear Otro</button>';
-            html += '<p style="font-size: 12px;">📤 Envío de frames pausado</p>';
+            html += '<button id="scanAnotherBtn" onclick="scanAnother()">🔍 Scan Another</button>';
+            html += '<p style="font-size: 12px;">📤 Transmission paused</p>';
             resultsDiv.innerHTML = html;
             
-            // Vibración de confirmación
+            // Haptic feedback confirmation
             if (navigator.vibrate) {
                 navigator.vibrate([100, 50, 100]);
             }
         } else {
-            // Detección temporal
-            let html = '<h4>📊 Detectando... (' + detectionConfidence + '/' + CONFIDENCE_THRESHOLD + ')</h4>';
+            let html = '<h4>📊 Detecting... (' + detectionConfidence + '/' + CONFIDENCE_THRESHOLD + ')</h4>';
             html += `<div class="barcode-result">
-                <strong>Código detectado:</strong> ${currentBarcode}
-                <br><small>Confirmando... Mantén enfocado</small>
+                <strong>Detected Code:</strong> ${currentBarcode}
+                <br><small>Verifying... Keep camera steady</small>
             </div>`;
             resultsDiv.innerHTML = html;
         }
     } else {
-        // Sin detección, resetear
         if (lockedBarcode !== null) {
             lockedBarcode = null;
             detectionConfidence = 0;
         }
-        resultsDiv.innerHTML = '<em>Escaneando... Apunta a un código</em>';
+        resultsDiv.innerHTML = '<em>Scanning... Align barcode inside box</em>';
     }
 }
 ```
-
-**Descripción**: Procesa resultados del servidor y gestiona el sistema de confianza.
-
-**Lógica de confianza**:
-1. Si el código detectado es el mismo que antes → Incrementa `detectionConfidence`
-2. Si es diferente → Resetea a 1
-3. Si `detectionConfidence >= CONFIDENCE_THRESHOLD` (2) → Bloquea
-4. Si fuente es confiable (PyZbar/WeChat) → Bloquea inmediatamente
-
-**Estados visuales**:
-- **Sin detección**: Muestra "Escaneando..."
-- **Detectando**: Muestra contador "1/2"
-- **Confirmado**: Fondo verde, botón "Escanear Otro"
-
-**Feedback háptico**: Vibración al confirmar (si está disponible).
 
 ---
 
@@ -878,114 +687,60 @@ function scanAnother() {
     detectionConfidence = 0;
     
     const resultsDiv = document.getElementById('barcodeResults');
-    resultsDiv.innerHTML = '<em>Escaneando... Apunta a un código</em>';
+    resultsDiv.innerHTML = '<em>Scanning... Align barcode inside box</em>';
     
     if (ws && ws.readyState === WebSocket.OPEN && !isSendingFrames) {
-        console.log('🔓 Desbloqueando - reanudando envío');
+        console.log('🔓 Unlocked - resuming capture stream');
         startSendingFrames();
     }
 }
 ```
 
-**Descripción**: Resetea el bloqueo y permite escanear otro código.
-
-**Acciones**:
-1. Resetea flags de confianza
-2. Limpia UI
-3. Reanuda envío de frames si el WS está conectado
-
 ---
 
-## Optimizaciones
+## Optimizations
 
 ### 1. Frame Skipping
+Captures at standard rendering speeds but only compiles and dispatches every 10th frame (`FRAME_SKIP = 9`), lowering local CPU usage by 90%.
 
-```javascript
-let frameSkipCounter = 0;
-const FRAME_SKIP = 9;
+### 2. Backpressure Throttle
+Monitors socket congestion using `ws.bufferedAmount`. Automatically delays frame dispatching if queue bottlenecks.
 
-if (frameSkipCounter % FRAME_SKIP !== 0) {
-    requestAnimationFrame(sendFrame);
-    return;
-}
-```
-
-**Beneficio**: Reduce carga de CPU y red en un 90%.
-
-### 2. Backpressure Control
-
-```javascript
-const MAX_BUFFERED = 512 * 1024;  // 512KB
-
-if (ws.bufferedAmount > MAX_BUFFERED) {
-    console.log('WS congestionado');
-    setTimeout(sendFrame, intervalMs * 1.5);
-    return;
-}
-```
-
-**Beneficio**: Evita acumulación de frames en el buffer del socket.
-
-### 3. Canvas Reuse
-
-```javascript
-if (!roiCanvas) {
-    roiCanvas = document.createElement('canvas');
-}
-// Reutilizar en cada frame
-```
-
-**Beneficio**: Reduce garbage collection y mejora rendimiento.
+### 3. Canvas Pooling
+Draws and extracts slices using persistent reusable canvas instances to minimize garbage collection stutters.
 
 ### 4. ROI Limiting
-
-```javascript
-const MAX_ROI_W = 640;
-const MAX_ROI_H = 360;
-const scaleDown = Math.min(1, MAX_ROI_W / sw, MAX_ROI_H / sh);
-```
-
-**Beneficio**: Limita bytes enviados sin sacrificar precisión.
-
-### 5. Adaptive Quality
-
-```javascript
-const usePNG = !!pngModeCheckbox?.checked;
-const mime = usePNG ? 'image/png' : 'image/jpeg';
-const q = parseFloat(jpegQualityInput.value) || 0.85;
-```
-
-**Beneficio**: Usuario controla balance calidad/velocidad.
+Caps resolution on the cropped slice (Max `640x360`) to restrict payload sizes without losing barcode density.
 
 ---
 
-## Flujo de Datos
+## Data Flow
 
-### Diagrama de Secuencia Completo
+### Complete Sequence Diagram
 
 ```
-Usuario                  Frontend                  WebSocket                 Backend
+User                  Frontend                  WebSocket                 Backend
   |                         |                         |                         |
-  |--[Click "Iniciar"]----->|                         |                         |
+  |--[Click "Start"]------->|                         |                         |
   |                         |--[getUserMedia]-------->|                         |
   |                         |<--[MediaStream]---------| (Browser API)           |
   |                         |                         |                         |
-  |<--[Cámara activa]-------|                         |                         |
+  |<--[Camera active]-------|                         |                         |
   |                         |                         |                         |
-  |--[Click "Conectar"]---->|                         |                         |
+  |--[Click "Connect"]----->|                         |                         |
   |                         |--[new WebSocket]------->|                         |
   |                         |                         |--[Handshake]----------->|
   |                         |                         |<--[Connection OK]-------|
   |                         |<--[onopen]--------------|                         |
-  |<--[Estado: Conectado]---|                         |                         |
+  |<--[State: Connected]----|                         |                         |
   |                         |                         |                         |
   |                         |--[startSendingFrames]-->|                         |
-  |                         |   (Bucle interno)       |                         |
+  |                         |   (Internal loop)       |                         |
   |                         |                         |                         |
-  |     [BUCLE CONTINUO]    |                         |                         |
-  |                         |--[Capturar frame]------>|                         |
-  |                         |--[Extraer ROI]--------->|                         |
-  |                         |--[Comprimir JPEG]------>|                         |
+  |     [CONTINUOUS LOOP]   |                         |                         |
+  |                         |--[Capture Frame]------->|                         |
+  |                         |--[Extract ROI]--------->|                         |
+  |                         |--[Compress to JPEG]---->|                         |
   |                         |                         |--[send(blob)]---------->|
   |                         |                         |                         |--[process_image]
   |                         |                         |                         |--[PyZbar]
@@ -997,108 +752,28 @@ Usuario                  Frontend                  WebSocket                 Bac
   |                         |--[displayResults]------>|                         |
   |                         |                         |                         |
   |<--[UI Update]-----------|                         |                         |
-  |   "Detectando... 1/2"   |                         |                         |
+  |   "Detecting... 1/2"    |                         |                         |
   |                         |                         |                         |
-  |     [Siguiente frame]   |                         |                         |
+  |     [Next frame]        |                         |                         |
   |                         |--[send(blob)]---------->|--[process_image]------->|
-  |                         |<--[JSON Response]-------|<--[Mismo código]--------|
+  |                         |<--[JSON Response]-------|<--[Same barcode read]---|
   |<--[UI Update]-----------|                         |                         |
-  |   "¡Confirmado! 🔒"     |                         |                         |
+  |   "Confirmed! 🔒"       |                         |                         |
   |                         |                         |                         |
-  |                         |--[STOP envío]---------->|                         |
+  |                         |--[STOP transmission]--->|                         |
   |                         |   (isLocked = true)     |                         |
   |                         |                         |                         |
-  |--[Click "Escanear"]---->|                         |                         |
+  |--[Click "Scan Another"]>|                         |                         |
   |                         |--[scanAnother]--------->|                         |
-  |                         |--[RESUME envío]-------->|                         |
+  |                         |--[RESUME transmission]-->|                         |
   |                         |                         |                         |
 ```
 
 ---
 
-## Mejoras Futuras
+## Conclusion
 
-### 1. Reconexión Automática
-
-```javascript
-function connectWithRetry(maxRetries = 3, delay = 2000) {
-    let retries = 0;
-    
-    function attempt() {
-        ws = new WebSocket(WS_URL);
-        
-        ws.onerror = () => {
-            if (retries < maxRetries) {
-                retries++;
-                console.log(`Reintento ${retries}/${maxRetries} en ${delay}ms`);
-                setTimeout(attempt, delay);
-            }
-        };
-    }
-    
-    attempt();
-}
-```
-
-### 2. Latency Monitoring
-
-```javascript
-let lastSendTime = 0;
-const latencies = [];
-
-function sendFrame() {
-    lastSendTime = Date.now();
-    ws.send(blob);
-}
-
-ws.onmessage = (event) => {
-    const latency = Date.now() - lastSendTime;
-    latencies.push(latency);
-    
-    if (latencies.length > 10) latencies.shift();
-    
-    const avgLatency = latencies.reduce((a,b) => a+b) / latencies.length;
-    console.log(`Latencia promedio: ${avgLatency.toFixed(0)}ms`);
-};
-```
-
-### 3. Adaptive Frame Rate
-
-```javascript
-if (avgLatency > 1500) {
-    frameInterval = Math.min(3000, frameInterval + 200);
-} else if (avgLatency < 500) {
-    frameInterval = Math.max(600, frameInterval - 100);
-}
-```
-
-### 4. Multiple Barcode Support
-
-```javascript
-// Mostrar múltiples códigos detectados
-data.barcodes.forEach((code, i) => {
-    html += `<div class="barcode-result">
-        <strong>${i+1}.</strong> ${code}
-        <small>(${data.sources[i]})</small>
-    </div>`;
-});
-```
-
----
-
-## Conclusión
-
-El cliente web implementa un sistema robusto y optimizado para detección de códigos en tiempo real, con:
-
-✅ Selección inteligente de cámara  
-✅ Sistema de confianza para reducir falsos positivos  
-✅ Optimizaciones de rendimiento (frame skipping, backpressure, ROI)  
-✅ UI responsive y feedback visual  
-✅ Manejo de errores completo  
-
-**Performance típico**:
-- 📊 1-2 frames/segundo enviados (con skipping)
-- 🚀 100-150ms latencia total
-- 💾 20-50KB por frame (JPEG 0.85)
-- ⚡ <5% CPU usage en cliente
-
+The web client provides a light and highly performant interface optimized for high-frequency scan pipelines:
+- **Average streaming lag**: 100-150ms.
+- **Estimated bandwidth consumption**: 20-50KB per frame (JPEG 0.85).
+- **Client CPU footprint**: < 5% average.

@@ -1,31 +1,31 @@
 ---
-name: Reporte de Error
-about: Describe un fallo para ayudarnos a corregirlo
+name: Bug Report
+about: Describe a bug to help us improve the software
 title: '[BUG] '
 labels: bug
 assignees: ''
 
 ---
 
-**Descripción del Error**
-Una descripción clara y concisa de lo que consiste el error.
+**Bug Description**
+A clear and concise description of what the bug is.
 
-**Pasos para Reproducir**
-Pasos para reproducir el comportamiento:
-1. Ir a '...'
-2. Hacer clic en '...'
-3. Ver error '...'
+**To Reproduce**
+Steps to reproduce the behavior:
+1. Go to '...'
+2. Click on '...'
+3. See error '...'
 
-**Comportamiento Esperado**
-Una descripción clara y concisa de lo que esperabas que sucediera.
+**Expected Behavior**
+A clear and concise description of what you expected to happen.
 
-**Capturas de Pantalla o Logs**
-Si aplica, añade capturas de pantalla o fragmentos de logs para ayudar a explicar tu problema.
+**Screenshots or Logs**
+If applicable, add screenshots or log snippets to help explain your problem.
 
-**Entorno:**
- - Sistema Operativo: [ej. Windows 11, Ubuntu 22.04]
- - Versión de Python: [ej. 3.13.1]
- - Versión de Omnilector: [ej. 1.0.0]
+**Environment:**
+ - OS: [e.g., Windows 11, Ubuntu 22.04]
+ - Python Version: [e.g., 3.13.1]
+ - Omnilector Version: [e.g., 1.0.0]
 
-**Contexto Adicional**
-Cualquier otro contexto o detalle sobre el problema aquí.
+**Additional Context**
+Add any other context or details about the problem here.
